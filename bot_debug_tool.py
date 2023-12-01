@@ -1,6 +1,7 @@
 from desktop_automation_tool.debug_tool.debugger_tool import DebuggerTool
 from desktop_automation_tool.processors_loader import Processor
 from predictor.predictor_object import Predictor
+from bot_api.handlers.gold_handler import GoldHandler
 from pathlib import Path
 import PySimpleGUI as sg
 
@@ -9,6 +10,7 @@ MODELS = ROOT / 'predictor' / 'models'
 
 
 def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
+    gui_window['DISPLAY'].update('')
     model_option = gui_window['MODEL_OPTIONS'].get()
     conf = gui_window['CONFIDENCE'].get()
 
@@ -24,6 +26,13 @@ def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
     print(res)
 
 
+def get_gold(gui_window: sg.Window, processor: Processor) -> None:
+    gui_window['DISPLAY'].update('')
+    gold_handler = GoldHandler(processor)
+    curr_gold = gold_handler.get_current_gold_on_bar()
+    print(curr_gold)
+
+
 EXTRA_LAYOUT = [
     [sg.Text("")],
 
@@ -33,14 +42,19 @@ EXTRA_LAYOUT = [
         sg.DropDown(size=(15, 1), key='MODEL_OPTIONS', values=[item.name.split('.')[0] for item in MODELS.iterdir()]),
         sg.Text('Confidence:', size=(10, 1)),
         sg.InputText(size=(6, 1), key="CONFIDENCE")
-    ]
+    ],
+
+    [sg.Text("")],
+
+    [sg.Button('Get Gold', pad=10, size=10, key='GET_GOLD_BTN')]
 ]
 
 
 CUSTOM_FUNCTIONS = {
     'layout': EXTRA_LAYOUT,
     'buttons': {
-      'PREDICT_BTN': make_prediction
+        'PREDICT_BTN': make_prediction,
+        'GET_GOLD_BTN': get_gold
     }
 }
 

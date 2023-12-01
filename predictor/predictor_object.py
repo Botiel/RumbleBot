@@ -47,7 +47,7 @@ class Predictor:
 
         model_obj = self.MODELS_DICT.get(model_name)
         if model_obj is None:
-            raise ValueError(f' No such model: {model_name}')
+            raise ValueError(f'No such model: {model_name}')
 
         model = YOLO(model_obj.path)
 
@@ -56,6 +56,7 @@ class Predictor:
             conf=conf if conf else model_obj.conf,
             save=save
         )
+        
         tensor = Tensor()
         for r in results:
             tensor = r.boxes.xywh
