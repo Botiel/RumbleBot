@@ -1,11 +1,11 @@
 import PySimpleGUI as sg
 import pyautogui
-from desktop_automation_tool.debug_tool.tabs import load_layout
+from rumble_bot_api.desktop_automation_tool.debug_tool.tabs import load_layout
 from pathlib import Path
 import subprocess
 import sys
-from desktop_automation_tool.utils.common import get_folder, get_images_as_dict
-from desktop_automation_tool.processors_loader import Processor
+from rumble_bot_api.desktop_automation_tool.utils.common import get_folder, get_images_as_dict
+from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 WINDOW_SIZE = (800, 900)
@@ -28,7 +28,7 @@ class DebuggerTool:
 
     def __init__(self, yaml_file: str | Path, title: str = 'Debugger', custom_functions: dict = None):
         self.processors = Processor(yaml_file)
-        self.images_dict = get_images_as_dict(self.processors.yaml_config)
+        self.images_dict = get_images_as_dict()
         self.custom_functions = custom_functions
 
         layout = load_layout(

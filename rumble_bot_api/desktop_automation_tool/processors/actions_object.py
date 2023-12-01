@@ -1,5 +1,5 @@
-from desktop_automation_tool.utils.data_objects import Rect, ImagePosition, Position
-from desktop_automation_tool.processors.window_object import WindowObject
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import Rect, ImagePosition, Position
+from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
 import pyautogui
 from typing import Union
 from time import sleep

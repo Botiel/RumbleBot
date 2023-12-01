@@ -9,9 +9,9 @@ import subprocess
 import sys
 from typing import Optional
 from pygetwindow import PyGetWindowException, Win32Window
-from desktop_automation_tool.utils.data_objects import Region
-from desktop_automation_tool.utils.custom_exceptions import WindowNotFoundException
-from desktop_automation_tool.utils.common import get_folder
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import Region
+from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import WindowNotFoundException
+from rumble_bot_api.desktop_automation_tool.utils.common import get_folder
 
 
 class WindowObject:

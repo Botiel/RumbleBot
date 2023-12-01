@@ -5,10 +5,10 @@ import pytesseract
 from pytesseract import Output
 import os
 from time import sleep, time
-from desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
-from desktop_automation_tool.utils.data_objects import Rect, Region, StringElement
-from desktop_automation_tool.utils.common import get_folder
-from desktop_automation_tool.processors.window_object import WindowObject
+from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import Rect, Region, StringElement
+from rumble_bot_api.desktop_automation_tool.utils.common import get_folder
+from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
 
 
 class Tesseract:

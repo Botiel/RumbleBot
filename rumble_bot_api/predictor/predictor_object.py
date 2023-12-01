@@ -2,12 +2,13 @@ from ultralytics import YOLO
 from ultralytics.engine.results import Results
 import numpy as np
 import cv2
+import os
 from torch import Tensor
 from pathlib import Path
 from typing import Literal
 from dataclasses import dataclass
-from desktop_automation_tool.utils.data_objects import Position
-from desktop_automation_tool.processors.window_object import WindowObject
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import Position
+from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
 
 
 @dataclass(kw_only=True)
@@ -27,8 +28,12 @@ class Predictor:
         'arrow': Model(path=str(MODELS_FOLDER / 'arrow.pt'), conf=0.8)
     }
 
-    def __init__(self, window: WindowObject):
+    def __init__(self, window: WindowObject, yaml_config: dict):
         self.window = window
+        self.output_dir = f"{yaml_config.get('project_root')}/output"
+
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
 
     def predict(
             self,
@@ -50,11 +55,11 @@ class Predictor:
             raise ValueError(f'No such model: {model_name}')
 
         model = YOLO(model_obj.path)
-
         results: Results = model.predict(
             source=image,
             conf=conf if conf else model_obj.conf,
-            save=save
+            save=save,
+            project=self.output_dir
         )
         
         tensor = Tensor()

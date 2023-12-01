@@ -1,8 +1,8 @@
 import logging
 from time import sleep
-from desktop_automation_tool import Position, Processor, Region
-from predictor.predictor_object import Predictor
-import bot_api.custom_exceptions as ex
+from rumble_bot_api.desktop_automation_tool import Position, Processor, Region
+from rumble_bot_api.predictor.predictor_object import Predictor
+import rumble_bot_api.bot_core.custom_exceptions as ex
 
 
 GOLD_REGION = Region(
@@ -15,7 +15,7 @@ class GoldHandler:
 
     def __init__(self, processor: Processor):
         self.processor = processor
-        self.predictor = Predictor(processor.window)
+        self.predictor = Predictor(processor.window, processor.yaml_config)
 
     def check_for_gold_ore_get_positions(self) -> list[Position] | None:
         logging.info('[Drop Handler] Checking for gold ore')

@@ -3,6 +3,9 @@ import logging
 import yaml
 import os
 
+ROOT = Path(__file__).resolve().parent.parent.parent
+DATA_FOLDER = ROOT / 'data'
+
 
 def load_yaml_file(path: str | Path) -> dict:
     logging.info('[System] Loading config.yaml file')
@@ -31,6 +34,5 @@ def get_folder(yaml_config: dict, folder: str) -> Path:
     return folder
 
 
-def get_images_as_dict(yaml_config: dict) -> dict:
-    data_folder = get_folder(yaml_config, 'data')
-    return {str(item.name): str(item) for item in data_folder.glob('**/*') if item.is_file() and item.match('*.png')}
+def get_images_as_dict() -> dict:
+    return {str(item.name): str(item) for item in DATA_FOLDER.glob('**/*') if item.is_file() and item.match('*.png')}
