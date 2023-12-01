@@ -1,8 +1,8 @@
-from desktop_automation_tool.processors.window_object import WindowObject
-from desktop_automation_tool.processors.image_processing import ImageProcessing
-from desktop_automation_tool.processors.tesseract import Tesseract
-from desktop_automation_tool.processors.actions_object import Actions
-from desktop_automation_tool.utils.common import load_yaml_file
+from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
+from rumble_bot_api.desktop_automation_tool.processors.image_processing import ImageProcessing
+from rumble_bot_api.desktop_automation_tool.processors.tesseract import Tesseract
+from rumble_bot_api.desktop_automation_tool.processors.actions_object import Actions
+from rumble_bot_api.desktop_automation_tool.utils.common import load_yaml_file
 from pathlib import Path
 import logging
 

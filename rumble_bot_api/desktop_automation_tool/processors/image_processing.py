@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 import logging
-from desktop_automation_tool.utils.common import get_folder
-from desktop_automation_tool.processors.window_object import WindowObject
-from desktop_automation_tool.utils.data_objects import ImageElement, Region, ImagePosition
+from rumble_bot_api.desktop_automation_tool.utils.common import get_folder
+from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import ImageElement, Region, ImagePosition
 from skimage.metrics import structural_similarity as ssim
 
 
