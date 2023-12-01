@@ -33,7 +33,7 @@ class Predictor:
         self.output_dir = f"{yaml_config.get('project_root')}/output"
 
         if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+            os.makedirs(self.output_dir, exist_ok=True)
 
     def predict(
             self,
