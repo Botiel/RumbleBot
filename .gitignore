@@ -1,3 +1,10 @@
+# Project
+config.yaml
+debug.py
+output/
+.idea/
+runs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
