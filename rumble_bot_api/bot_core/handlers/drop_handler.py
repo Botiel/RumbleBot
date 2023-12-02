@@ -2,8 +2,9 @@ import logging
 import pyautogui
 from time import sleep
 from rumble_bot_api.desktop_automation_tool import Processor, Position, ImagePosition
-from rumble_bot_api.bot_core.utils.load_images import get_lineup_from_minis_dict, create_minis_dict
-from rumble_bot_api.bot_core.utils.load_images import TOWER_IMAGE
+from rumble_bot_api.bot_core.mini_assets import MINI_ASSETS
+from rumble_bot_api.bot_core.utils.data_objects import Asset, Node
+from rumble_bot_api.bot_core.utils.constants import TOWER_IMAGE
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
 import rumble_bot_api.bot_core.utils.custom_exceptions as ex
 from random import choice
@@ -52,13 +53,15 @@ class MinisDropHandler:
             BOTTOM=Position(x=x, y=y + bottom_y_offset)
         )
 
-    def get_current_minis_on_board(self, minis_dict: dict, lineup: list[str]) -> dict[ImagePosition]:
-        element_lineup = get_lineup_from_minis_dict(minis_dict, lineup)
+    def get_current_minis_on_board(self, lineup: list[Node]) -> dict:
         results = {}
-        for k, v in element_lineup.items():
-            element = self.processor.image_processing.find_element(v)
-            if element.ssim > v.ssim:
-                results.update({k: v})
+        for pick in lineup:
+            x, y, ssim = self.processor.image_processing.find_object_on_screen_get_coordinates(
+                image_path=pick.path,
+                specific_region=MINI_ASSETS.region
+            )
+            if ssim > MINI_ASSETS.ssim:
+                results.update({pick.name: Position(x=x, y=y)})
         return results
 
     # --------------------------------------------- MINIS DROP ---------------------------------------------------------
@@ -73,7 +76,11 @@ if __name__ == '__main__':
     p = Processor(yaml_file)
     p.window.set_window()
     handler = MinisDropHandler(p)
-    _minis_dict = create_minis_dict()
-    _lineup = ['baron_1', 'harpies_1', 'pilot_0', 'prowler_0', 'necromancer_0', 'ghoul_0', 'gryphon_0']
-    current = handler.get_current_minis_on_board(_minis_dict, _lineup)
+    _lineup = [
+        MINI_ASSETS.baron_rivendare.skill_1,
+        MINI_ASSETS.necromancer.no_skill,
+        MINI_ASSETS.prowler.skill_1,
+        MINI_ASSETS.ghoul.no_skill
+    ]
+    current = handler.get_current_minis_on_board(_lineup)
     pprint(current)
