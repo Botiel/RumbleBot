@@ -76,3 +76,23 @@ class Actions:
         self.window.move_to(x, y)
         sleep(0.25)
         pyautogui.drag(x_axis, 0, duration)
+
+    def drag_and_drop(
+            self,
+            element: Element,
+            drop_position: Position,
+            timeout_before_moving: float = 0,
+            timeout_before_dropping: float = 0,
+            wait_after_drop: float = 0,
+            drag_duration: float = 0
+    ) -> None:
+        self.hold(element)
+        self.move_to(
+            drop_position,
+            timeout_before_moving,
+            timeout_before_dropping,
+            drag_duration
+        )
+        pyautogui.mouseUp()
+        sleep(wait_after_drop)
+
