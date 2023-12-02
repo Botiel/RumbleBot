@@ -35,6 +35,7 @@ class ImageElement:
     path: str
     threshold: int = 0
     region: Region | None = None
+    ssim: float | None = None
 
 
 @dataclass(kw_only=True)
