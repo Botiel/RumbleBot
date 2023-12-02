@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class MiniAssets(BaseModel):
-    ssim: float = 0.8
+    ssim: float = 0.7
     region: Region = Region(top_left=Position(x=330, y=830), bottom_right=Position(x=770, y=970))
 
     # Minis
