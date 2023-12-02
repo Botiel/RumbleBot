@@ -74,6 +74,6 @@ if __name__ == '__main__':
     p.window.set_window()
     handler = MinisDropHandler(p)
     _minis_dict = create_minis_dict()
-    _lineup = ['baron_1', 'harpies_1', 'pilot_0', 'prowler_0', 'necromancer_0', 'ghoul_0']
+    _lineup = ['baron_1', 'harpies_1', 'pilot_0', 'prowler_0', 'necromancer_0', 'ghoul_0', 'gryphon_0']
     current = handler.get_current_minis_on_board(_minis_dict, _lineup)
     pprint(current)

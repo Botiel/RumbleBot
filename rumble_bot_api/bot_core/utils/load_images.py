@@ -3,9 +3,9 @@ from pathlib import Path
 from rumble_bot_api.desktop_automation_tool import ImageElement, Region, Position
 
 RUMBLE_BOT_API_FOLDER = Path(__file__).resolve().parent.parent.parent
-DATA_FOLDER = RUMBLE_BOT_API_FOLDER / 'data'
-MINIS_FOLDER = DATA_FOLDER / 'minis'
-TOWER_IMAGE = DATA_FOLDER / 'other' / 'tower.png'
+ASSETS_FOLDER = RUMBLE_BOT_API_FOLDER / 'assets'
+MINIS_FOLDER = ASSETS_FOLDER / 'minis'
+TOWER_IMAGE = ASSETS_FOLDER / 'other' / 'tower.png'
 
 MINIS_SSIM = 0.8
 MINIS_BOARD_REGION = Region(

@@ -4,7 +4,7 @@ import yaml
 import os
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-DATA_FOLDER = ROOT / 'data'
+ASSETS_FOLDER = ROOT / 'assets'
 
 
 def load_yaml_file(path: str | Path) -> dict:
@@ -35,4 +35,4 @@ def get_folder(yaml_config: dict, folder: str) -> Path:
 
 
 def get_images_as_dict() -> dict:
-    return {str(item.name): str(item) for item in DATA_FOLDER.glob('**/*') if item.is_file() and item.match('*.png')}
+    return {str(item.name): str(item) for item in ASSETS_FOLDER.glob('**/*') if item.is_file() and item.match('*.png')}
