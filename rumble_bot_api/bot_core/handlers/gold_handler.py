@@ -2,7 +2,7 @@ import logging
 from time import sleep
 from rumble_bot_api.desktop_automation_tool import Position, Processor, Region
 from rumble_bot_api.predictor.predictor_object import Predictor
-import rumble_bot_api.bot_core.custom_exceptions as ex
+import rumble_bot_api.bot_core.utils.custom_exceptions as ex
 
 
 GOLD_REGION = Region(
