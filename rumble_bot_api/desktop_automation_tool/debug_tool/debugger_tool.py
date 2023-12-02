@@ -6,6 +6,7 @@ import subprocess
 import sys
 from rumble_bot_api.desktop_automation_tool.utils.common import get_folder, get_images_as_dict
 from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import Region, Position
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 WINDOW_SIZE = (800, 900)
@@ -104,11 +105,25 @@ class DebuggerTool:
             name = self.window['IMAGE_NAME'].get()
             path = self.images_dict.get(name)
 
+            try:
+                x_top = int(self.window['REGION_TOP_LEFT_X'].get())
+                y_top = int(self.window['REGION_TOP_LEFT_Y'].get())
+                x_bottom = int(self.window['REGION_BOTTOM_RIGHT_X'].get())
+                y_bottom = int(self.window['REGION_BOTTOM_RIGHT_Y'].get())
+            except Exception:
+                region = None
+            else:
+                region = Region(
+                    top_left=Position(x=x_top, y=y_top),
+                    bottom_right=Position(x=x_bottom, y=y_bottom)
+                )
+
             if path:
                 threshold = self.window['IMAGE_THRESHOLD'].get()
                 result = self.processors.image_processing.find_object_on_screen_get_coordinates(
                     image_path=path,
                     threshold=int(threshold) if threshold else None,
+                    specific_region=region
                 )
                 print('x: ', result[0])
                 print('y: ', result[1])
