@@ -1,12 +1,12 @@
 from pprint import pprint
 from pydantic import BaseModel, Field
-from rumble_bot_api.bot_core.utils.constants import MINIS_FOLDER
+from rumble_bot_api.bot_core.utils.common import MINIS_FOLDER
 
 
 class Node(BaseModel):
+    name: str = Field(default=None)
     path: str = Field(default=None)
     cost: int = Field(default=None)
-    name: str = Field(default=None)
 
 
 class Asset(BaseModel):
