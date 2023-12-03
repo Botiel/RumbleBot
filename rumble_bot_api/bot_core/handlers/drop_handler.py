@@ -38,10 +38,12 @@ class MinisDropHandler:
     def set_quests_lineup(self, lineup: list[Node]) -> None:
         logging.info('[Drop Handler] setting up quests lineup')
         self.quests_lineup = lineup
+        self.quests_lineup.append(MINI_ASSETS.miner.no_skill)
 
     def set_pvp_lineup(self, lineup: list[Node]) -> None:
         logging.info('[Drop Handler] setting up pvp lineup')
         self.pvp_lineup = lineup
+        self.pvp_lineup.append(MINI_ASSETS.miner.no_skill)
 
     def set_game_mode(self, game_mode: Literal['pvp', 'quests']) -> None:
 
@@ -73,7 +75,7 @@ class MinisDropHandler:
         x = self.tower_center.x
         y = self.tower_center.y
 
-        self.drop_zones =  DropZone(
+        self.drop_zones = DropZone(
             LEFT=Position(x=x - x_offset, y=y + y_offset),
             RIGHT=Position(x=x + x_offset, y=y + y_offset),
             TOP=Position(x=x, y=y + center_y_offset),
@@ -127,7 +129,7 @@ class MinisDropHandler:
 
         return before_gold_count > after_gold_count
 
-    def try_drop_miner(self, dropzone: Position = None) -> bool:
+    def drop_miner_for_quests(self) -> bool:
 
         # Finding miner position on screen
         miner_x, miner_y, miner_ssim = self.processor.image_processing.find_object_on_screen_get_coordinates(
@@ -147,17 +149,15 @@ class MinisDropHandler:
             logging.info('[Drop Handler] Did not find gold ore')
             return False
 
-        if self.game_mode == 'quests':
+        if self.game_mode is None:
+            logging.error('[Drop Handler] game mode is not set!')
+            sys.exit(1)
+        else:
             gold_pos = choice(gold_positions)
             if gold_pos.x > self.tower_center.x:
                 zone = self.drop_zones.RIGHT
             else:
                 zone = self.drop_zones.LEFT
-        elif self.game_mode == 'pvp':
-            zone = dropzone
-        else:
-            logging.error('[Drop Handler] game mode is not set!')
-            sys.exit(1)
 
         self.gold_handler.wait_until_enough_gold(1)
         before_gold_count = self.gold_handler.get_current_gold_on_bar()
@@ -167,11 +167,24 @@ class MinisDropHandler:
         return before_gold_count > after_gold_count
 
 
-# ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------- TESTING ----------------------------------------------------------
-# ----------------------------------------------------------------------------------------------------------------------
-def test_dropping_minis(handler: MinisDropHandler) -> None:
+def test_main() -> None:
+    from pathlib import Path
     from pprint import pprint
+
+    option = input('[1]test_dropping_minis\n'
+                   '[2]test_dropping_miner\n'
+                   '[3]show current minis on board\n'
+                   '>>> ')
+
+    root = Path(__file__).resolve().parent.parent.parent.parent
+    yaml_file = root / 'config.yaml'
+    p = Processor(yaml_file)
+    p.window.set_window()
+
+    handler = MinisDropHandler(p)
+    handler.set_game_mode('quests')
+    handler.calculate_drop_zones_for_quests()
 
     _lineup = [
         MINI_ASSETS.prowler.skill_1,
@@ -183,35 +196,15 @@ def test_dropping_minis(handler: MinisDropHandler) -> None:
 
     handler.set_quests_lineup(_lineup)
 
-    current = handler.get_current_minis_on_board()
-
-    print('=========================== CURRENT MINIS ON BOARD ===========================')
-    pprint(current)
-    print('==============================================================================\n\n\n')
-
-    handler.drop_mini('baron_rivendare', handler.drop_zones.TOP)
-    handler.drop_mini('harpies', handler.drop_zones.LEFT)
-    handler.drop_mini('gryphon_rider', handler.drop_zones.RIGHT)
-
-
-def test_main() -> None:
-    from pathlib import Path
-
-    option = input('[1]test_dropping_minis\n[2]test_dropping_miner\n>>> ')
-
-    root = Path(__file__).resolve().parent.parent.parent.parent
-    yaml_file = root / 'config.yaml'
-    p = Processor(yaml_file)
-    p.window.set_window()
-
-    handler = MinisDropHandler(p)
-    handler.set_game_mode('quests')
-    handler.calculate_drop_zones_for_quests()
-
     if option == '1':
-        test_dropping_minis(handler)
+        handler.drop_mini('baron_rivendare', handler.drop_zones.TOP)
+        handler.drop_mini('harpies', handler.drop_zones.LEFT)
+        handler.drop_mini('gryphon_rider', handler.drop_zones.RIGHT)
     if option == '2':
-        handler.try_drop_miner()
+        handler.drop_miner_for_quests()
+    if option == '3':
+        current = handler.get_current_minis_on_board()
+        pprint(current)
 
 
 if __name__ == '__main__':
