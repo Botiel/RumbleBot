@@ -24,8 +24,8 @@ MODELS_FOLDER = CURR / 'models'
 class Predictor:
 
     MODELS_DICT = {
-        'gold': Model(path=str(MODELS_FOLDER / 'gold.pt'), conf=0.9),
-        'arrow': Model(path=str(MODELS_FOLDER / 'arrow.pt'), conf=0.8)
+        'gold': Model(path=str(MODELS_FOLDER / 'gold.pt'), conf=0.85),
+        'arrow': Model(path=str(MODELS_FOLDER / 'arrow.pt'), conf=0.85)
     }
 
     def __init__(self, window: WindowObject, yaml_config: dict):
@@ -33,7 +33,7 @@ class Predictor:
         self.output_dir = f"{yaml_config.get('project_root')}/output"
 
         if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+            os.makedirs(self.output_dir, exist_ok=True)
 
     def predict(
             self,

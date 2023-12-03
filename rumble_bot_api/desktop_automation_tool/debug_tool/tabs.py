@@ -9,7 +9,6 @@ DROP_INPUT = (5, 1)
 
 
 def load_layout(yaml_config: dict, images_dict: dict, custom_functions: dict = None) -> list:
-
     coordinates_frame = [
         [sg.Text("")],
 
@@ -39,7 +38,6 @@ def load_layout(yaml_config: dict, images_dict: dict, custom_functions: dict = N
 
         [sg.Button("Set Window", pad=10, size=10, key="SET_WINDOW_BTN")]
 
-
     ]
 
     tesseract = [
@@ -60,20 +58,29 @@ def load_layout(yaml_config: dict, images_dict: dict, custom_functions: dict = N
     ]
 
     image = [
-        [sg.Text("")],
-
-        [sg.Text("Image Threshold:", size=(21, 1)), sg.InputText(size=(7, 1), key="IMAGE_THRESHOLD", default_text='')],
 
         [
-            sg.Text("Image Name:", size=(21, 1)),
+            sg.Text("Image Name:", size=(15, 1)),
             sg.DropDown(
                 size=(15, 1),
                 key="IMAGE_NAME",
                 default_value='',
                 values=list(images_dict)
             )
-         ],
+        ],
 
+        [sg.Text("Image Threshold:", size=(15, 1)), sg.InputText(size=(7, 1), key="IMAGE_THRESHOLD", default_text='')],
+
+        [
+            sg.Text("Region:", size=(15, 1)),
+            sg.Text("top_left_xy", size=(8, 1)),
+            sg.InputText(size=(5, 1), key="REGION_TOP_LEFT_X"),
+            sg.InputText(size=(5, 1), key="REGION_TOP_LEFT_Y"),
+
+            sg.Text("bottom_right_xy", size=(12, 1)),
+            sg.InputText(size=(5, 1), key="REGION_BOTTOM_RIGHT_X"),
+            sg.InputText(size=(5, 1), key="REGION_BOTTOM_RIGHT_Y"),
+        ],
 
         [sg.Button("Find Image", pad=10, size=10, key="FIND_IMAGE_BTN")],
 

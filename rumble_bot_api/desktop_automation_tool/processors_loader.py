@@ -17,4 +17,4 @@ class Processor:
         self.window = WindowObject(self.yaml_config)
         self.tesseract = Tesseract(self.window, self.yaml_config)
         self.image_processing = ImageProcessing(self.window, self.yaml_config)
-        self.actions = Actions(self.window)
+        self.actions = Actions(self.window, self. tesseract)
