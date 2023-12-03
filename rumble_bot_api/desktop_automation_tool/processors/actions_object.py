@@ -1,5 +1,7 @@
-from rumble_bot_api.desktop_automation_tool.utils.data_objects import Rect, ImagePosition, Position
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import Rect, ImagePosition, Position, StringElement
 from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
+from rumble_bot_api.desktop_automation_tool.processors.tesseract import Tesseract
+from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 import pyautogui
 from typing import Union
 from time import sleep
@@ -9,8 +11,9 @@ Element = Union[Rect, ImagePosition, Position]
 
 class Actions:
 
-    def __init__(self, window: WindowObject):
+    def __init__(self, window: WindowObject, tesseract: Tesseract):
         self.window = window
+        self.tesseract = tesseract
 
     @staticmethod
     def check_element(element: Element) -> tuple[int, int]:
@@ -96,3 +99,27 @@ class Actions:
         pyautogui.mouseUp()
         sleep(wait_after_drop)
 
+    def click_string_element_until_hidden(self, element: StringElement, intervals: float = 2) -> None:
+        location = self.tesseract.wait_for_element(element, timeout=3)[0]
+        while self.tesseract.check_if_element_is_visible_on_screen(element):
+            self.click(location, timeout_after_action=intervals)
+
+    def wait_and_try_click_string_element(
+            self,
+            element: StringElement,
+            timeout: float = 5,
+            timeout_before_click: float = 0,
+            timeout_after_click: float = 0,
+            ignore_exception: bool = False
+    ) -> bool:
+
+        try:
+            location = self.tesseract.wait_for_element(element, timeout)[0]
+        except ElementNotFoundException:
+            if ignore_exception:
+                return False
+            else:
+                raise ElementNotFoundException
+
+        self.click(location, timeout_before_click, timeout_after_click)
+        return True
