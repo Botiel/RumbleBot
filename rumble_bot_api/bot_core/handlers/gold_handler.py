@@ -2,7 +2,7 @@ import logging
 from time import sleep
 from rumble_bot_api.desktop_automation_tool import Position, Processor, Region
 from rumble_bot_api.predictor.predictor_object import Predictor
-import rumble_bot_api.bot_core.utils.custom_exceptions as ex
+from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 
 
 GOLD_REGION = Region(
@@ -42,7 +42,7 @@ class GoldHandler:
                 if item in [str(x) for x in range(11)]:
                     return int(item)
 
-        raise ex.ElementNotFoundException
+        raise ElementNotFoundException
 
     def wait_until_enough_gold(self, gold: int) -> None:
         logging.info(f'[Drop Handler] Waiting for [{gold}] gold to play mini')

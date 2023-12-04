@@ -1,12 +1,11 @@
 import logging
-import pyautogui
-from time import sleep
 from rumble_bot_api.desktop_automation_tool import Processor, Position
 from rumble_bot_api.bot_core.mini_assets import MINI_ASSETS
 from rumble_bot_api.bot_core.utils.common import TOWER_IMAGE
 from rumble_bot_api.bot_core.utils.data_objects import Node
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
-import rumble_bot_api.bot_core.utils.custom_exceptions as ex
+from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ImageNotFoundException
+from rumble_bot_api.bot_core.utils.common import get_yaml_config_file
 from random import choice
 import sys
 from typing import Optional, Literal
@@ -21,7 +20,7 @@ class DropZone:
     BOTTOM: Position
 
 
-class MinisDropHandler:
+class DropHandler:
 
     def __init__(self, processor: Processor):
         self.processor = processor
@@ -55,13 +54,13 @@ class MinisDropHandler:
 
     # ------------------- CALCULATIONS ------------------------
 
-    def init_tower_center_by_pixels(self, tower_ssim: float = 0.7) -> None:
+    def init_tower_center_by_pixels(self, tower_ssim: float = 0.6) -> None:
         x, y, ssim = self.processor.image_processing.find_object_on_screen_get_coordinates(image_path=str(TOWER_IMAGE))
         if ssim > tower_ssim:
             logging.info(f'[Drop Handler] Tower Center by pixels: ({x}, {y})')
             self.tower_center = Position(x=x, y=y)
         else:
-            raise ex.ImageNotFoundException
+            raise ImageNotFoundException
 
     def calculate_drop_zones_for_quests(self) -> None:
         logging.info('[Drop Handler] Calculating Tower Center')
@@ -169,7 +168,6 @@ class MinisDropHandler:
 
 # --------------------------------------------------- TESTING ----------------------------------------------------------
 def test_main() -> None:
-    from pathlib import Path
     from pprint import pprint
 
     option = input('[1]test_dropping_minis\n'
@@ -177,12 +175,10 @@ def test_main() -> None:
                    '[3]show current minis on board\n'
                    '>>> ')
 
-    root = Path(__file__).resolve().parent.parent.parent.parent
-    yaml_file = root / 'config.yaml'
-    p = Processor(yaml_file)
+    p = Processor(get_yaml_config_file())
     p.window.set_window()
 
-    handler = MinisDropHandler(p)
+    handler = DropHandler(p)
     handler.set_game_mode('quests')
     handler.calculate_drop_zones_for_quests()
 

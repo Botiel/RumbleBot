@@ -29,7 +29,7 @@ class ImageProcessing:
             specific_region: Region = None,
     ) -> tuple[int, int, float]:
 
-        logging.info('[Image Processing] Searching for object on screen location')
+        logging.debug('[Image Processing] Searching for object on screen location')
 
         image_object = cv2.imread(image_path)
         image_screen = self.window.get_window_screenshot(specific_region)
@@ -75,7 +75,7 @@ class ImageProcessing:
             specific_region: Region,
             threshold: int = 10,
     ) -> bool:
-        logging.info(f'[Image Processing] Searching for color on screen location: {hex_color}')
+        logging.debug(f'[Image Processing] Searching for color on screen location: {hex_color}')
 
         image = self.window.get_window_screenshot(specific_region)
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
