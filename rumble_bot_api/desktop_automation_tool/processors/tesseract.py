@@ -58,7 +58,7 @@ class Tesseract:
         :return:
         """
 
-        logging.info('[Tesseract] Extracting strings from screenshot')
+        logging.debug('[Tesseract] Extracting strings from screenshot')
 
         if specific_region:
             image = self.window.get_window_screenshot(specific_region)
@@ -89,7 +89,7 @@ class Tesseract:
 
         extracted_text = data.get('text')
 
-        logging.info(f'f[Tesseract] Extracting string coordinates: {string}')
+        logging.debug(f'[Tesseract] Extracting string coordinates: {string}')
         extracted = []
         for i, text in enumerate(extracted_text):
 
@@ -109,6 +109,18 @@ class Tesseract:
                 extracted.append(temp)
 
         return extracted
+
+    def extract_many_string_coordinates_from_tesseract_data(
+            self,
+            string_elements: list[str],
+            threshold: int,
+            exact_match: bool,
+            region: tuple | list[tuple] = None
+    ) -> list[Rect]:
+        li = []
+        for s in string_elements:
+            li.extend(self.extract_string_coordinates_from_tesseract_data(s, threshold, exact_match, region))
+        return li
 
     def check_if_string_is_visible_on_screen(self, string: str, threshold: int, exact_match: bool) -> bool:
         logging.debug(f'[Tesseract] Checking if element is visible: {string}')

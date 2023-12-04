@@ -32,7 +32,7 @@ class WindowObject:
         logging.info(f'[Window] Setting window object')
         self.window = window
 
-    def run_emulator(self) -> None:
+    def run_window(self) -> None:
         try:
             subprocess.Popen(
                 [self.executable_path],

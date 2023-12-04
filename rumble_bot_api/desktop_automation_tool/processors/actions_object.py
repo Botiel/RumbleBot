@@ -99,10 +99,17 @@ class Actions:
         pyautogui.mouseUp()
         sleep(wait_after_drop)
 
-    def click_string_element_until_hidden(self, element: StringElement, intervals: float = 2) -> None:
+    def click_string_element_until_hidden(self, element: StringElement, intervals: float = 2, clicks: int = 10) -> None:
         location = self.tesseract.wait_for_element(element, timeout=3)[0]
+
+        click_count = 0
         while self.tesseract.check_if_element_is_visible_on_screen(element):
+
             self.click(location, timeout_after_action=intervals)
+            click_count += 1
+
+            if click_count == clicks:
+                raise Exception(f'element is still visible after {clicks} clicks')
 
     def wait_and_try_click_string_element(
             self,
