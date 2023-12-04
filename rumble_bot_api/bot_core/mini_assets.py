@@ -23,6 +23,9 @@ class MiniAssets(BaseModel):
     sylvanas_windrunner: Asset = create_asset('sylvanas_windrunner', cost=6)
     stonehoof_tauren: Asset = create_asset('stonehoof_tauren', cost=4)
     darkspear_troll: Asset = create_asset('darkspear_troll', cost=3)
+    quilboar: Asset = create_asset('quilboar', cost=2)
+    tirion_fordring: Asset = create_asset('tirion_fordring', cost=4)
+    huntress: Asset = create_asset('huntress', cost=5)
 
 
 MINI_ASSETS = MiniAssets()
