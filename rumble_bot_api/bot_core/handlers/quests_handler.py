@@ -5,7 +5,6 @@ from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
-from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
 from rumble_bot_api.bot_core.handlers.error_handler import ErrorHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 from rumble_bot_api.bot_core.utils.data_objects import Node
@@ -16,7 +15,6 @@ class QuestsHandler(BaseHandler):
 
     def __init__(self, processor: Processor, lineup: list[Node], levelup_list: list[str]):
         super().__init__(processor)
-        self.drop_handler = DropHandler(processor)
         self.error_handler = ErrorHandler(processor, 'quests')
         self.lineup = lineup
         self.levelup_list = levelup_list
@@ -60,7 +58,7 @@ class QuestsHandler(BaseHandler):
         while self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.PLAY):
             self.actions.click(to_click, timeout_after_action=2)
 
-    def init_quests_state(self) -> None:
+    def init_quests(self) -> None:
         logging.info('[Quests Handler] Starting Quests')
 
         if self.actions.wait_and_try_click_string_element(STRING_ASSETS.CLAIM, 4, ignore_exception=True):
@@ -76,7 +74,7 @@ class QuestsHandler(BaseHandler):
 
         self.set_game_state(GameState.QUESTS_PRE_MATCH)
 
-    def pre_match_state(self) -> None:
+    def pre_match(self) -> None:
         logging.info('[Match Handler] Pre Match')
 
         self.wait_for_load_state()
@@ -87,24 +85,17 @@ class QuestsHandler(BaseHandler):
 
         self.actions.wait_and_try_click_string_element(STRING_ASSETS.START)
 
-        while True:
-            try:
-                self.drop_handler.gold_handler.get_current_gold_on_bar()
-            except ElementNotFoundException:
-                sleep(1)
-                continue
-            else:
-                break
+        self.wait_for_match_to_start()
 
         self.set_game_state(GameState.QUESTS_MATCH_LOOP)
 
-    def quests_game_loop_state(self) -> None:
+    def match_loop(self) -> None:
         logging.info('[Quests Handler] Starting a Quests Match')
 
         curr_zone = self.drop_handler.drop_zones.LEFT
 
         while True:
-            not_dropped_counter = 0
+
             for mini in self.lineup:
                 logging.info(f'[Quests Handler] Next Mini in queue: {mini.name}')
 
@@ -125,13 +116,6 @@ class QuestsHandler(BaseHandler):
                     else:
                         curr_zone = self.drop_handler.drop_zones.LEFT
 
-                if not is_dropped:
-                    not_dropped_counter += 1
-
-                if not_dropped_counter == 7:
-                    self.set_game_state(GameState.QUESTS_GAME_FINISH)
-                    return
-
             error = [
                 self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.ERROR),
                 self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.RUMBLE)
@@ -141,7 +125,7 @@ class QuestsHandler(BaseHandler):
                 self.set_game_state(GameState.ERROR_STATE)
                 return
 
-    def game_finish_state(self) -> None:
+    def match_finish(self) -> None:
         logging.info('[Match Handler] Navigating to a new game')
 
         is_continue = None
@@ -177,13 +161,13 @@ class QuestsHandler(BaseHandler):
             try:
                 match self.current_state:
                     case GameState.INIT_QUESTS:
-                        self.init_quests_state()
+                        self.init_quests()
                     case GameState.QUESTS_PRE_MATCH:
-                        self.pre_match_state()
+                        self.pre_match()
                     case GameState.QUESTS_MATCH_LOOP:
-                        self.quests_game_loop_state()
+                        self.match_loop()
                     case GameState.QUESTS_GAME_FINISH:
-                        self.game_finish_state()
+                        self.match_finish()
                     case GameState.ERROR_STATE:
                         self.error_handler.handler_errors()
             except Exception as e:
@@ -227,4 +211,4 @@ if __name__ == '__main__':
         q.main_loop()
 
     if option == '2':
-        q.quests_game_loop_state()
+        q.match_loop()
