@@ -7,6 +7,7 @@ from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
 from rumble_bot_api.bot_core.handlers.error_handler import ErrorHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
+from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
 from rumble_bot_api.bot_core.utils.data_objects import Node
 
 
@@ -93,7 +94,6 @@ class QuestsHandler(BaseHandler):
         curr_zone = self.drop_handler.drop_zones.LEFT
 
         while True:
-            not_dropped_counter = 0
             for mini in self.lineup:
                 logging.info(f'[Quests Handler] Next Mini in queue: {mini.name}')
 
@@ -101,8 +101,8 @@ class QuestsHandler(BaseHandler):
                     is_dropped = self.drop_handler.drop_mini(mini.name, curr_zone)
                     if is_dropped:
                         self.drop_handler.drop_miner_for_quests()
-                except ElementNotFoundException:
-                    # checking for the gold cost rectangle element
+                except (ElementNotFoundException, NoMinisOnBoardException):
+                    # checking for the gold cost rectangle element and minis board
                     self.set_game_state(GameState.QUESTS_GAME_FINISH)
                     return
 
@@ -113,13 +113,6 @@ class QuestsHandler(BaseHandler):
                         curr_zone = self.drop_handler.drop_zones.RIGHT
                     else:
                         curr_zone = self.drop_handler.drop_zones.LEFT
-
-                if not is_dropped:
-                    not_dropped_counter += 1
-
-                if not_dropped_counter == 7:
-                    self.set_game_state(GameState.QUESTS_GAME_FINISH)
-                    return
 
             error = [
                 self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.ERROR),

@@ -9,3 +9,9 @@ class GoldNotFoundException(Exception):
     def __init__(self, message='Could not find gold quantity image'):
         self.message = message
         super().__init__(self.message)
+
+
+class NoMinisOnBoardException(Exception):
+    def __init__(self, message='Could not find minis on board!'):
+        self.message = message
+        super().__init__(self.message)

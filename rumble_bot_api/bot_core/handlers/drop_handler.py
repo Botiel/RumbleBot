@@ -9,6 +9,7 @@ from rumble_bot_api.bot_core.utils.common import TOWER_IMAGE
 from rumble_bot_api.bot_core.utils.data_objects import Node
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ImageNotFoundException
+from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
 
 
 @dataclass(kw_only=True)
@@ -112,6 +113,10 @@ class DropHandler:
     def drop_mini(self, mini: str, dropzone: Position) -> bool:
 
         current_minis = self.get_current_minis_on_board()
+
+        if not current_minis:
+            raise NoMinisOnBoardException
+
         result = current_minis.get(mini)
 
         if not result:

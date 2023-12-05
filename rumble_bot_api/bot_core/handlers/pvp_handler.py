@@ -7,6 +7,7 @@ from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
 from rumble_bot_api.bot_core.handlers.error_handler import ErrorHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
+from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
 from rumble_bot_api.bot_core.utils.data_objects import Node
 
 
@@ -43,10 +44,9 @@ class PvpHandler(BaseHandler):
         logging.info('[PvP Handler] Starting a PvP Match')
 
         while True:
-
             try:
                 self.pvp_logic()
-            except ElementNotFoundException:
+            except (ElementNotFoundException, NoMinisOnBoardException):
                 self.set_game_state(GameState.PVP_GAME_FINISH)
                 return
 
