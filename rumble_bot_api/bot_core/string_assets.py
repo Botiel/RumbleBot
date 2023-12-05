@@ -13,11 +13,11 @@ class StringAssets(BaseModel):
     QUEST: StringElement = StringElement(string='quest!', threshold=210)
     TAP_TO_SKIP: StringElement = StringElement(string='Tap', threshold=100, exact_match=True)
     CLAIM_REWARDS: StringElement = StringElement(string='reward', threshold=230)
-    ERROR: StringElement = StringElement(string='error', exact_match=True)
+    ERROR: StringElement = StringElement(string='Error', threshold=180, exact_match=True)
     LOADING: StringElement = StringElement(string='loading', threshold=160)
     LEVEL_UP: StringElement = StringElement(string='up!', threshold=180)
     TRY_AGAIN: StringElement = StringElement(string='again!', threshold=180)
-    OK: StringElement = StringElement(string='ok', threshold=170, exact_match=True)
+    OK: StringElement = StringElement(string='OK', threshold=180, exact_match=True)
     VS: StringElement = StringElement(string='vs', threshold=220)
 
 

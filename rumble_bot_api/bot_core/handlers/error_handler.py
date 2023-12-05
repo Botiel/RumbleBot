@@ -103,8 +103,7 @@ class ErrorHandler(BaseHandler):
     def handler_errors(self) -> GameState:
         logging.error('[Error Handler] error handling loop started')
 
-        attempts = 0
-        while attempts < 5:
+        while True:
             state = self.check_for_error_message()
             if state:
                 return state
@@ -118,10 +117,6 @@ class ErrorHandler(BaseHandler):
                 return state
 
             self.handle_level_up()
-
-            attempts += 1
-
-        return self.reopen_emulator()
 
 
 if __name__ == '__main__':

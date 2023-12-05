@@ -19,27 +19,3 @@ def set_logger(log_level: int = logging.DEBUG) -> None:
 
 def get_all_mini_asset_names() -> list[str]:
     return [item.name.split('.')[0] for item in MINIS_FOLDER.iterdir()]
-
-
-def find_root_dir() -> Path:
-    current_path = CURR
-
-    while True:
-        curr = current_path / 'venv'
-        if curr.exists() and current_path.is_dir():
-            return current_path
-
-        if curr.name.lower() == 'users':
-            raise Exception('Could not find project root, please create a venv')
-
-        current_path = current_path.parent
-
-
-def get_yaml_config_file() -> Path:
-    root = find_root_dir()
-    file = root / 'config.yaml'
-
-    if file.exists() and file.is_file():
-        return file
-
-    raise FileNotFoundError("could not find config.yaml file")

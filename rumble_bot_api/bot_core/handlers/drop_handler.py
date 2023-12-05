@@ -1,15 +1,14 @@
 import logging
+import sys
+from random import choice
+from typing import Optional, Literal
+from dataclasses import dataclass
 from rumble_bot_api.desktop_automation_tool import Processor, Position
 from rumble_bot_api.bot_core.mini_assets import MINI_ASSETS
 from rumble_bot_api.bot_core.utils.common import TOWER_IMAGE
 from rumble_bot_api.bot_core.utils.data_objects import Node
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ImageNotFoundException
-from rumble_bot_api.bot_core.utils.common import get_yaml_config_file
-from random import choice
-import sys
-from typing import Optional, Literal
-from dataclasses import dataclass
 
 
 @dataclass(kw_only=True)
@@ -164,44 +163,3 @@ class DropHandler:
         after_gold_count = self.gold_handler.get_current_gold_on_bar()
 
         return before_gold_count > after_gold_count
-
-
-# --------------------------------------------------- TESTING ----------------------------------------------------------
-def test_main() -> None:
-    from pprint import pprint
-
-    option = input('[1]test_dropping_minis\n'
-                   '[2]test_dropping_miner\n'
-                   '[3]show current minis on board\n'
-                   '>>> ')
-
-    p = Processor(get_yaml_config_file())
-    p.window.set_window()
-
-    handler = DropHandler(p)
-    handler.set_game_mode('quests')
-    handler.calculate_drop_zones_for_quests()
-
-    _lineup = [
-        MINI_ASSETS.prowler.skill_1,
-        MINI_ASSETS.baron_rivendare.skill_1,
-        MINI_ASSETS.necromancer.skill_1,
-        MINI_ASSETS.harpies.skill_1,
-        MINI_ASSETS.gryphon_rider.skill_1,
-    ]
-
-    handler.set_quests_lineup(_lineup)
-
-    if option == '1':
-        handler.drop_mini('baron_rivendare', handler.drop_zones.TOP)
-        handler.drop_mini('harpies', handler.drop_zones.LEFT)
-        handler.drop_mini('gryphon_rider', handler.drop_zones.RIGHT)
-    if option == '2':
-        handler.drop_miner_for_quests()
-    if option == '3':
-        current = handler.get_current_minis_on_board()
-        pprint(current)
-
-
-if __name__ == '__main__':
-    test_main()
