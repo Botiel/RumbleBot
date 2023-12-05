@@ -8,19 +8,19 @@ from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
 from rumble_bot_api.bot_core.handlers.error_handler import ErrorHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
-from rumble_bot_api.bot_core.utils.data_objects import Node
+from rumble_bot_api.bot_core.utils.data_objects import MatchLineup
 
 
 class PvpHandler(BaseHandler):
 
-    def __init__(self, processor: Processor, lineup: list[Node], pvp_logic: Callable):
+    def __init__(self, processor: Processor, match_lineup: MatchLineup, pvp_logic: Callable):
         super().__init__(processor)
 
         self.error_handler = ErrorHandler(processor, 'quests')
-        self.lineup = lineup
+        self.match_lineup = match_lineup
 
         self.drop_handler.set_game_mode('pvp')
-        self.drop_handler.set_pvp_lineup(lineup)
+        self.drop_handler.set_pvp_lineup(match_lineup.lineup)
         self.pvp_logic = pvp_logic
 
     def init_pvp(self) -> None:
