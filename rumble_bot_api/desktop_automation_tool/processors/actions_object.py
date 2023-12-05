@@ -68,17 +68,33 @@ class Actions:
         x, y = self.check_element(element)
         self.window.action(pyautogui.mouseUp, "release", x, y, timeout_before_action, timeout_after_action, duration)
 
-    def scroll_vertical(self, y_axis: int, duration: float = 0) -> None:
-        x, y = self.window.get_window_screen_center()
+    def scroll_vertical(self, y_axis: int, from_position: Position = None, duration: float = 0.5) -> None:
+        if from_position:
+            x = from_position.x
+            y = from_position.y
+        else:
+            x, y = self.window.get_window_screen_center()
         self.window.move_to(x, y)
         sleep(0.25)
-        pyautogui.drag(0, y_axis, duration)
+        pyautogui.mouseDown()
+        sleep(0.25)
+        self.window.move_to(x, y_axis + y, duration=duration)
+        sleep(0.25)
+        pyautogui.mouseUp()
 
-    def scroll_horizontal(self, x_axis: int, duration: float = 0) -> None:
-        x, y = self.window.get_window_screen_center()
+    def scroll_horizontal(self, x_axis: int, from_position: Position = None, duration: float = 0.5) -> None:
+        if from_position:
+            x = from_position.x
+            y = from_position.y
+        else:
+            x, y = self.window.get_window_screen_center()
         self.window.move_to(x, y)
         sleep(0.25)
-        pyautogui.drag(x_axis, 0, duration)
+        pyautogui.mouseDown()
+        sleep(0.25)
+        self.window.move_to(x_axis + x, y, duration=duration)
+        sleep(0.25)
+        pyautogui.mouseUp()
 
     def drag_and_drop(
             self,

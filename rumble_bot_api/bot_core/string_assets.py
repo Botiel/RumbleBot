@@ -19,6 +19,7 @@ class StringAssets(BaseModel):
     TRY_AGAIN: StringElement = StringElement(string='again!', threshold=180)
     OK: StringElement = StringElement(string='OK', threshold=180, exact_match=True)
     VS: StringElement = StringElement(string='vs', threshold=220)
+    TROOPS: StringElement = StringElement(string='troops', threshold=180)
 
 
 STRING_ASSETS = StringAssets()

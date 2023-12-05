@@ -8,24 +8,23 @@ from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
 from rumble_bot_api.bot_core.handlers.error_handler import ErrorHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
-from rumble_bot_api.bot_core.utils.data_objects import Node
+from rumble_bot_api.bot_core.utils.data_objects import MatchLineup
 
 
 class QuestsHandler(BaseHandler):
 
-    def __init__(self, processor: Processor, lineup: list[Node], levelup_list: list[str]):
+    def __init__(self, processor: Processor, match_lineup: MatchLineup):
         super().__init__(processor)
         self.error_handler = ErrorHandler(processor, 'quests')
-        self.lineup = lineup
-        self.levelup_list = levelup_list
+        self.match_lineup = match_lineup
 
         self.drop_handler.set_game_mode('quests')
-        self.drop_handler.set_quests_lineup(lineup)
+        self.drop_handler.set_quests_lineup(match_lineup.lineup)
 
     def match_mini_and_play_button_in_quest(self) -> None:
         logging.info('[Quests Handler] Matching minions in quest to buttons')
 
-        new_li = [item.split('_')[0] for item in self.levelup_list]
+        new_li = [item.name.split('_')[0] for item in self.match_lineup.levelup_list]
 
         minis = self.tesseract.extract_many_string_coordinates_from_tesseract_data(new_li, 180, False)
         buttons = self.tesseract.wait_for_element(STRING_ASSETS.PLAY, 5)
@@ -94,7 +93,7 @@ class QuestsHandler(BaseHandler):
         curr_zone = self.drop_handler.drop_zones.LEFT
 
         while True:
-            for mini in self.lineup:
+            for mini in self.match_lineup.lineup:
                 logging.info(f'[Quests Handler] Next Mini in queue: {mini.name}')
 
                 try:
