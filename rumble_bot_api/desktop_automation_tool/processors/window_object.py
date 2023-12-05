@@ -7,6 +7,7 @@ from numpy import ndarray
 import pygetwindow
 import subprocess
 import sys
+from uuid import uuid4
 from typing import Optional
 from pygetwindow import PyGetWindowException, Win32Window
 from rumble_bot_api.desktop_automation_tool.utils.data_objects import Region
@@ -69,10 +70,12 @@ class WindowObject:
     def get_window_screenshot(
             self,
             specific_region: Region = None,
-            save_image: bool = False
+            save_image: bool = False,
+            generate_name: bool = False
     ) -> ndarray:
         """
 
+        :param generate_name: will generate a unique screenshot name
         :param specific_region: 2 pairs of (x, y) box region coordinates
         :param save_image: True | False
         :return:
@@ -92,7 +95,12 @@ class WindowObject:
 
         if save_image:
             output = get_folder(self._yaml_config, 'output')
-            file = output / 'window_screenshot.png'
+
+            if generate_name:
+                file = output / f'window_screenshot_{uuid4().hex[:15]}.png'
+            else:
+                file = output / 'window_screenshot.png'
+
             cv2.imwrite(str(file), screenshot)
             logging.info(f'[Window] Saved image to: {file}')
 
