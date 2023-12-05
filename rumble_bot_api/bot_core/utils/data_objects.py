@@ -29,6 +29,12 @@ class Asset(BaseModel):
     skill_3: Node = Field(default=None)
 
 
+class MatchLineup(BaseModel):
+    lineup: list[Node]
+    hero: Asset
+    levelup_list: list[Asset] | None = None
+
+
 def create_asset(name: str, cost: int, changed_cost: dict = None) -> Asset:
     temp = {
         'name': name,
