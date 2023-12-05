@@ -36,7 +36,10 @@ def load_layout(yaml_config: dict, images_dict: dict, custom_functions: dict = N
 
         [sg.Text("")],
 
-        [sg.Button("Set Window", pad=10, size=10, key="SET_WINDOW_BTN")]
+        [
+            sg.Button("Set Window", pad=10, size=10, key="SET_WINDOW_BTN"),
+            sg.Button("Take Screenshot", pad=10, size=15, key="TAKE_SCREENSHOT_BTN")
+        ]
 
     ]
 
@@ -62,7 +65,7 @@ def load_layout(yaml_config: dict, images_dict: dict, custom_functions: dict = N
         [
             sg.Text("Image Name:", size=(15, 1)),
             sg.DropDown(
-                size=(15, 1),
+                size=(25, 1),
                 key="IMAGE_NAME",
                 default_value='',
                 values=list(images_dict)

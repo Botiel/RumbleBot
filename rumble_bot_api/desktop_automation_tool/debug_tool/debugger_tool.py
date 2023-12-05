@@ -74,6 +74,9 @@ class DebuggerTool:
         if event == 'SET_WINDOW_BTN':
             self.processors.window.set_window()
 
+        if event == 'TAKE_SCREENSHOT_BTN':
+            self.processors.window.get_window_screenshot(save_image=True, generate_name=True)
+
         if event == 'EXTRACT_STRINGS_BTN':
             self.window['DISPLAY'].update('')
             text = self.processors.tesseract.extract_strings_from_window_image(

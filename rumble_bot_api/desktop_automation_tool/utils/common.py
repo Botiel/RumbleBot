@@ -3,7 +3,8 @@ import logging
 import yaml
 import os
 
-ROOT = Path(__file__).resolve().parent.parent.parent
+CURR = Path(__file__).resolve().parent
+ROOT = CURR.parent.parent
 ASSETS_FOLDER = ROOT / 'assets'
 
 
@@ -36,3 +37,17 @@ def get_folder(yaml_config: dict, folder: str) -> Path:
 
 def get_images_as_dict() -> dict:
     return {str(item.name): str(item) for item in ASSETS_FOLDER.glob('**/*') if item.is_file() and item.match('*.png')}
+
+
+def find_root_dir() -> Path:
+    current_path = CURR
+
+    while True:
+        curr = current_path / 'venv'
+        if curr.exists() and current_path.is_dir():
+            return current_path
+
+        if curr.name.lower() == 'users':
+            raise Exception('Could not find project root, please create a venv')
+
+        current_path = current_path.parent
