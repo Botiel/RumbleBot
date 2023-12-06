@@ -35,14 +35,13 @@ def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
 
     try:
         f_conf = float(conf)
-    except Exception as e:
-        print(e)
-        print('Using default conf for goldmine model')
-        f_conf = None
+    except Exception:
+        f_conf = 0.8
 
     p = Predictor(processor.window, processor.yaml_config)
-    res = p.predict(model_name=model_option, return_type='positions', save=True, conf=f_conf)
-    print(res)
+    res = p.predict(prediction_type=model_option, save=True, conf=f_conf)
+    for r in res:
+        print(r)
 
 
 def get_gold(gui_window: sg.Window, processor: Processor) -> None:
@@ -59,7 +58,14 @@ def get_extra_layout() -> list:
         [
             sg.Button('Predict', pad=10, size=10, key='PREDICT_BTN'),
             sg.Text('Model:', size=(7, 1)),
-            sg.DropDown(size=(15, 1), key='MODEL_OPTIONS', values=[item.name.split('.')[0] for item in MODELS.iterdir()]),
+
+            sg.DropDown(
+                size=(15, 1),
+                key='MODEL_OPTIONS',
+                values=['goldmine', 'arrow', 'enemy', 'chest', 'all'],
+                default_value='all'
+            ),
+
             sg.Text('Confidence:', size=(10, 1)),
             sg.InputText(size=(6, 1), key="CONFIDENCE")
         ],
