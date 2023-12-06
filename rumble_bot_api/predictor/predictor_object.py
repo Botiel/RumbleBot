@@ -3,46 +3,41 @@ from ultralytics.engine.results import Results
 import numpy as np
 import cv2
 import os
-from torch import Tensor
-from pathlib import Path
 from typing import Literal
-from dataclasses import dataclass
-from rumble_bot_api.desktop_automation_tool.utils.data_objects import Position
+from pathlib import Path
+from rumble_bot_api.predictor.data_objects import PredictionNode
 from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
 
 
-@dataclass(kw_only=True)
-class Model:
-    path: str
-    conf: float
-
-
 CURR = Path(__file__).resolve().parent
-MODELS_FOLDER = CURR / 'models'
+MODEL_PATH = CURR / 'rumble.pt'
+PredictionType = Literal['goldmine', 'arrow', 'enemy', 'chest', 'all']
 
 
 class Predictor:
 
-    MODELS_DICT = {
-        'gold': Model(path=str(MODELS_FOLDER / 'gold.pt'), conf=0.9),
-        'arrow': Model(path=str(MODELS_FOLDER / 'arrow.pt'), conf=0.85)
+    NODES_MAP = {
+        'goldmine': 0,
+        'arrow': 1,
+        'enemy': 2,
+        'chest': 3
     }
 
-    def __init__(self, window: WindowObject, yaml_config: dict):
+    def __init__(self, window: WindowObject, yaml_config: dict, model_path: str = str(MODEL_PATH)):
         self.window = window
         self.output_dir = f"{yaml_config.get('project_root')}/output"
+        self.model_path = model_path
 
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir, exist_ok=True)
 
     def predict(
             self,
-            model_name: Literal['gold', 'enemy', 'arrow'],
-            return_type: Literal['positions', 'tensor'] = 'positions',
+            prediction_type: PredictionType,
             image: str | np.ndarray = None,
-            conf: float = None,
+            conf: float = 0.8,
             save: bool = False
-    ) -> Tensor | list[Position]:
+    ) -> list[PredictionNode]:
 
         if isinstance(image, str):
             image = cv2.imread(image)
@@ -50,28 +45,28 @@ class Predictor:
         if image is None:
             image = self.window.get_window_screenshot()
 
-        model_obj = self.MODELS_DICT.get(model_name)
-        if model_obj is None:
-            raise ValueError(f'No such model: {model_name}')
+        model = YOLO(self.model_path)
 
-        model = YOLO(model_obj.path)
         results: Results = model.predict(
             source=image,
-            conf=conf if conf else model_obj.conf,
+            conf=conf,
             save=save,
             project=self.output_dir
         )
-        
-        tensor = Tensor()
-        for r in results:
-            tensor = r.boxes.xywh
 
-        if return_type == 'tensor':
-            return tensor
-        elif return_type == 'positions':
-            return [Position(x=int(t[0]), y=int(t[1])) for t in tensor]
-        else:
-            raise ValueError(f'No such return type: {return_type}')
+        prediction_li = []
+        for result in results:
+            for node in result.boxes.data.tolist():
+                if int(node[-1]) == self.NODES_MAP.get(prediction_type) or prediction_type == 'all':
+                    prediction_li.append(
+                        PredictionNode(
+                            x=int(node[0]),
+                            y=int(node[1]),
+                            h=int(node[2]),
+                            w=int(node[3]),
+                            conf=node[4],
+                            node_id=int(node[5]),
+                        )
+                    )
 
-
-
+        return prediction_li
