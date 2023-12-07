@@ -60,10 +60,10 @@ class Predictor:
                 if int(node[-1]) == self.NODES_MAP.get(prediction_type) or prediction_type == 'all':
                     prediction_li.append(
                         PredictionNode(
-                            x=int(node[0]),
-                            y=int(node[1]),
-                            h=int(node[2]),
-                            w=int(node[3]),
+                            top_x=int(node[0]),
+                            top_y=int(node[1]),
+                            bottom_x=int(node[2]),
+                            bottom_y=int(node[3]),
                             conf=node[4],
                             node_id=int(node[5]),
                         )
