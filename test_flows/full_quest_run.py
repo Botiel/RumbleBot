@@ -12,7 +12,7 @@ if __name__ == '__main__':
             MINI_ASSETS.prowler.skill_1,
             MINI_ASSETS.necromancer.skill_1,
             MINI_ASSETS.gryphon_rider.skill_1,
-            MINI_ASSETS.pilot.no_skill,
+            MINI_ASSETS.pilot.skill_1,
             MINI_ASSETS.harpies.skill_1,
             MINI_ASSETS.ghoul.skill_1,
             MINI_ASSETS.baron_rivendare.skill_1

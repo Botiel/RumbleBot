@@ -7,7 +7,7 @@ YAML_FILE = ROOT / 'config.yaml'
 
 
 def init_processor() -> Processor:
-    set_logger()
+    set_logger(20)
     p = Processor(YAML_FILE)
     p.window.set_window()
     return p

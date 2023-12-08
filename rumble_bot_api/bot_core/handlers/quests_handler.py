@@ -94,6 +94,10 @@ class QuestsHandler(BaseHandler):
 
         while True:
             for mini in self.match_lineup.lineup:
+
+                if mini == 'miner':
+                    continue
+
                 logging.info(f'[Quests Handler] Next Mini in queue: {mini.name}')
 
                 try:

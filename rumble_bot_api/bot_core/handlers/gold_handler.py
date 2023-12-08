@@ -20,14 +20,15 @@ class GoldHandler:
     def check_for_gold_ore_get_positions(self) -> list[Position] | None:
         logging.info('[Drop Handler] Checking for gold ore')
 
-        positions = self.predictor.predict(model_name='gold')
+        prediction = self.predictor.predict(conf=0.9)
+        gold_positions = [p.center for p in prediction.goldmine]
 
-        if not positions:
+        if not gold_positions:
             logging.info('[Drop Handler] Gold ores not found')
             return
 
-        logging.debug(f'[Drop Handler] Found gold ores: {positions}')
-        return positions
+        logging.debug(f'[Drop Handler] Found gold ores: {gold_positions}')
+        return gold_positions
 
     def get_current_gold_on_bar(self, region: Region = GOLD_REGION) -> int:
 
