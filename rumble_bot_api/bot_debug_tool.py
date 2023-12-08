@@ -2,6 +2,7 @@ from rumble_bot_api.desktop_automation_tool.debug_tool.debugger_tool import Debu
 from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.predictor.predictor_object import Predictor
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
+from dataclasses import asdict
 from pathlib import Path
 import PySimpleGUI as sg
 import shutil
@@ -30,7 +31,6 @@ def find_root_dir() -> Path:
 
 def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
     gui_window['DISPLAY'].update('')
-    model_option = gui_window['MODEL_OPTIONS'].get()
     conf = gui_window['CONFIDENCE'].get()
 
     try:
@@ -39,9 +39,12 @@ def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
         f_conf = 0.8
 
     p = Predictor(processor.window, processor.yaml_config)
-    res = p.predict(prediction_type=model_option, save=True, conf=f_conf)
-    for r in res:
-        print(r)
+    res = p.predict(save=True, conf=f_conf)
+    res_as_dict = asdict(res)
+
+    for k, v in res_as_dict.items():
+        for item in v:
+            print(f"[{item['name']}] [{item['center']['x']}, {item['center']['y']}]\n")
 
 
 def get_gold(gui_window: sg.Window, processor: Processor) -> None:
@@ -57,15 +60,6 @@ def get_extra_layout() -> list:
 
         [
             sg.Button('Predict', pad=10, size=10, key='PREDICT_BTN'),
-            sg.Text('Model:', size=(7, 1)),
-
-            sg.DropDown(
-                size=(15, 1),
-                key='MODEL_OPTIONS',
-                values=['goldmine', 'arrow', 'enemy', 'chest', 'all'],
-                default_value='all'
-            ),
-
             sg.Text('Confidence:', size=(10, 1)),
             sg.InputText(size=(6, 1), key="CONFIDENCE")
         ],
@@ -73,7 +67,7 @@ def get_extra_layout() -> list:
         [sg.Text("")],
 
         [sg.Button('Get Gold', pad=10, size=10, key='GET_GOLD_BTN')]
-]
+    ]
 
 
 def main() -> None:

@@ -28,3 +28,11 @@ class PredictionNode:
             x=(self.bottom_x - self.top_x) // 2 + self.top_x,
             y=(self.bottom_y - self.top_y) // 2 + self.top_y
         )
+
+
+@dataclass(kw_only=True)
+class PredictionCluster:
+    goldmine: list[PredictionNode] = field(default_factory=list)
+    arrow: list[PredictionNode] = field(default_factory=list)
+    enemy: list[PredictionNode] = field(default_factory=list)
+    chest: list[PredictionNode] = field(default_factory=list)

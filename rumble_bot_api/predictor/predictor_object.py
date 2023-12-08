@@ -3,25 +3,16 @@ from ultralytics.engine.results import Results
 import numpy as np
 import cv2
 import os
-from typing import Literal
 from pathlib import Path
-from rumble_bot_api.predictor.data_objects import PredictionNode
+from rumble_bot_api.predictor.data_objects import PredictionNode, PredictionCluster
 from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
 
 
 CURR = Path(__file__).resolve().parent
 MODEL_PATH = CURR / 'rumble.pt'
-PredictionType = Literal['goldmine', 'arrow', 'enemy', 'chest', 'all']
 
 
 class Predictor:
-
-    NODES_MAP = {
-        'goldmine': 0,
-        'arrow': 1,
-        'enemy': 2,
-        'chest': 3
-    }
 
     def __init__(self, window: WindowObject, yaml_config: dict, model_path: str = str(MODEL_PATH)):
         self.window = window
@@ -31,13 +22,7 @@ class Predictor:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir, exist_ok=True)
 
-    def predict(
-            self,
-            prediction_type: PredictionType,
-            image: str | np.ndarray = None,
-            conf: float = 0.8,
-            save: bool = False
-    ) -> list[PredictionNode]:
+    def predict(self, image: str | np.ndarray = None, conf: float = 0.8, save: bool = False) -> PredictionCluster:
 
         if isinstance(image, str):
             image = cv2.imread(image)
@@ -54,19 +39,25 @@ class Predictor:
             project=self.output_dir
         )
 
-        prediction_li = []
+        prediction_cluster = PredictionCluster()
         for result in results:
             for node in result.boxes.data.tolist():
-                if int(node[-1]) == self.NODES_MAP.get(prediction_type) or prediction_type == 'all':
-                    prediction_li.append(
-                        PredictionNode(
-                            top_x=int(node[0]),
-                            top_y=int(node[1]),
-                            bottom_x=int(node[2]),
-                            bottom_y=int(node[3]),
-                            conf=node[4],
-                            node_id=int(node[5]),
-                        )
-                    )
+                temp_node = PredictionNode(
+                    top_x=int(node[0]),
+                    top_y=int(node[1]),
+                    bottom_x=int(node[2]),
+                    bottom_y=int(node[3]),
+                    conf=node[4],
+                    node_id=int(node[5]),
+                )
+                match temp_node.name:
+                    case 'goldmine':
+                        prediction_cluster.goldmine.append(temp_node)
+                    case 'arrow':
+                        prediction_cluster.arrow.append(temp_node)
+                    case 'enemy':
+                        prediction_cluster.enemy.append(temp_node)
+                    case 'chest':
+                        prediction_cluster.chest.append(temp_node)
 
-        return prediction_li
+        return prediction_cluster
