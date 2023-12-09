@@ -2,6 +2,11 @@
 Bot for Warcraft Rumble
 
 
+## Installation
+- install python 3.11
+- install tesseract: https://github.com/UB-Mannheim/tesseract/wiki
+
+
 ## Minis List
 - abomination
 - angry_chickens

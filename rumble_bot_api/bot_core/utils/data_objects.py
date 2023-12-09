@@ -7,7 +7,6 @@ from rumble_bot_api.bot_core.utils.common import MINIS_FOLDER
 class GameState(Enum):
     ERROR_STATE = 'error_state'
     INIT_QUESTS = 'init_quests'
-    QUESTS_PRE_MATCH = 'quests_pre_match'
     QUESTS_MATCH_LOOP = 'quests_match_loop'
     QUESTS_GAME_FINISH = 'quests_game_finish'
     INIT_PVP = 'init_pvp'
@@ -23,7 +22,7 @@ class Node(BaseModel):
 
 class Asset(BaseModel):
     name: str = Field(default=None)
-    no_skill: Node = Field(default=None)
+    skill_0: Node = Field(default=None)
     skill_1: Node = Field(default=None)
     skill_2: Node = Field(default=None)
     skill_3: Node = Field(default=None)
@@ -38,7 +37,7 @@ class MatchLineup(BaseModel):
 def create_asset(name: str, cost: int, changed_cost: dict = None) -> Asset:
     temp = {
         'name': name,
-        'no_skill': {
+        'skill_0': {
             'path': str(MINIS_FOLDER / f'{name}_0.png'),
             'cost': cost,
             'name': name

@@ -37,12 +37,11 @@ class DropHandler:
     def set_quests_lineup(self, lineup: list[Node]) -> None:
         logging.info('[Drop Handler] setting up quests lineup')
         self.quests_lineup = lineup
-        self.quests_lineup.append(MINI_ASSETS.miner.no_skill)
 
     def set_pvp_lineup(self, lineup: list[Node]) -> None:
         logging.info('[Drop Handler] setting up pvp lineup')
         self.pvp_lineup = lineup
-        self.pvp_lineup.append(MINI_ASSETS.miner.no_skill)
+        self.pvp_lineup.append(MINI_ASSETS.miner.skill_0)
 
     def set_game_mode(self, game_mode: Literal['pvp', 'quests']) -> None:
 
@@ -136,7 +135,7 @@ class DropHandler:
 
         # Finding miner position on screen
         miner_x, miner_y, miner_ssim = self.processor.image_processing.find_object_on_screen_get_coordinates(
-            image_path=MINI_ASSETS.miner.no_skill.path,
+            image_path=MINI_ASSETS.miner.skill_0.path,
             specific_region=MINI_ASSETS.region
         )
 

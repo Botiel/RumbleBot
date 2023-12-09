@@ -58,8 +58,8 @@ class ErrorHandler(BaseHandler):
         if self.mode == 'quests':
             elements_to_check = [
                 (STRING_ASSETS.START, GameState.QUESTS_MATCH_LOOP),
-                (STRING_ASSETS.TRY_AGAIN, GameState.QUESTS_PRE_MATCH),
-                (STRING_ASSETS.PLAY, GameState.QUESTS_PRE_MATCH),
+                (STRING_ASSETS.TRY_AGAIN, GameState.QUESTS_MATCH_LOOP),
+                (STRING_ASSETS.PLAY, GameState.INIT_QUESTS),
                 (STRING_ASSETS.CONTINUE, GameState.QUESTS_GAME_FINISH),
                 (STRING_ASSETS.CLAIM, GameState.INIT_QUESTS),
                 (STRING_ASSETS.QUEST, GameState.INIT_QUESTS),
@@ -81,7 +81,6 @@ class ErrorHandler(BaseHandler):
             is_clicked = self.actions.wait_and_try_click_string_element(element, 1, 1, ignore_exception=True)
             if is_clicked:
                 return state
-        return
 
     def reopen_emulator(self) -> GameState | None:
         logging.info('[Error Handler] Could not handle errors, re-opening emulator')
@@ -117,13 +116,3 @@ class ErrorHandler(BaseHandler):
                 return state
 
             self.handle_level_up()
-
-
-if __name__ == '__main__':
-    from rumble_bot_api.bot_core.utils.common import find_root_dir, set_logger
-    set_logger()
-    root = find_root_dir()
-    p = Processor(root / 'config.yaml')
-    p.window.set_window()
-    e = ErrorHandler(p, 'quests')
-    e.reopen_emulator()

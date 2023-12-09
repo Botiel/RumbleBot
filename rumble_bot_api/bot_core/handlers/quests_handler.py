@@ -6,8 +6,7 @@ from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
 from rumble_bot_api.bot_core.handlers.error_handler import ErrorHandler
-from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
-from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
+from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException, GoldNotFoundException
 from rumble_bot_api.bot_core.utils.data_objects import MatchLineup
 
 
@@ -71,10 +70,10 @@ class QuestsHandler(BaseHandler):
 
         self.match_mini_and_play_button_in_quest()
 
-        self.set_game_state(GameState.QUESTS_PRE_MATCH)
+        self.set_game_state(GameState.QUESTS_MATCH_LOOP)
 
-    def pre_match(self) -> None:
-        logging.info('[Match Handler] Pre Match')
+    def match_loop(self) -> None:
+        logging.info('[Quests Handler] Starting a Quests Match')
 
         self.wait_for_load_state()
         self.tesseract.wait_for_element_state(STRING_ASSETS.START, state='visible', timeout=45)
@@ -87,16 +86,10 @@ class QuestsHandler(BaseHandler):
 
         self.set_game_state(GameState.QUESTS_MATCH_LOOP)
 
-    def match_loop(self) -> None:
-        logging.info('[Quests Handler] Starting a Quests Match')
-
         curr_zone = self.drop_handler.drop_zones.LEFT
 
         while True:
             for mini in self.match_lineup.lineup:
-
-                if mini == 'miner':
-                    continue
 
                 logging.info(f'[Quests Handler] Next Mini in queue: {mini.name}')
 
@@ -104,7 +97,7 @@ class QuestsHandler(BaseHandler):
                     is_dropped = self.drop_handler.drop_mini(mini.name, curr_zone)
                     if is_dropped:
                         self.drop_handler.drop_miner_for_quests()
-                except (ElementNotFoundException, NoMinisOnBoardException):
+                except (GoldNotFoundException, NoMinisOnBoardException):
                     # checking for the gold cost rectangle element and minis board
                     self.set_game_state(GameState.QUESTS_GAME_FINISH)
                     return
@@ -146,7 +139,7 @@ class QuestsHandler(BaseHandler):
 
         if is_try_again:
             self.actions.click_string_element_until_hidden(STRING_ASSETS.TRY_AGAIN)
-            self.set_game_state(GameState.QUESTS_PRE_MATCH)
+            self.set_game_state(GameState.QUESTS_MATCH_LOOP)
             return
 
         if is_continue:
@@ -163,8 +156,6 @@ class QuestsHandler(BaseHandler):
                 match self.current_state:
                     case GameState.INIT_QUESTS:
                         self.init_quests()
-                    case GameState.QUESTS_PRE_MATCH:
-                        self.pre_match()
                     case GameState.QUESTS_MATCH_LOOP:
                         self.match_loop()
                     case GameState.QUESTS_GAME_FINISH:

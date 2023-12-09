@@ -44,7 +44,14 @@ def find_root_dir() -> Path:
 
     while True:
         curr = current_path / 'venv'
-        if curr.exists() and current_path.is_dir():
+        curr2 = current_path / '.venv'
+
+        conditions = [
+            curr.exists() and current_path.is_dir(),
+            curr2.exists() and current_path.is_dir()
+        ]
+
+        if any(conditions):
             return current_path
 
         if curr.name.lower() == 'users':
