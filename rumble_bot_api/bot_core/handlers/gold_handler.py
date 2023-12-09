@@ -28,23 +28,18 @@ class GoldHandler:
         return gold_positions
 
     def get_current_gold_on_bar(self, region: Region = GOLD_REGION) -> int:
-
         logging.debug('[Gold Handler] Checking for current gold')
 
-        for _ in range(4):
-            text = self.processor.tesseract.extract_strings_from_window_image(
-                threshold=220,
-                specific_region=region,
-                only_text=True
-            )
+        text = self.processor.tesseract.extract_strings_from_window_image(
+            threshold=220,
+            specific_region=region,
+            only_text=True
+        )
 
-            for item in text:
-                if item in [str(x) for x in range(11)]:
-                    logging.debug(f'[Gold Handler] Current gold: {item}')
-                    return int(item)
-
-            logging.debug('[Gold Handler] did not find gold quantity image, sleeping 1 second and retrying')
-            sleep(1)
+        for item in text:
+            if item in [str(x) for x in range(11)]:
+                logging.debug(f'[Gold Handler] Current gold: {item}')
+                return int(item)
 
         raise GoldNotFoundException
 
