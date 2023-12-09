@@ -17,7 +17,7 @@ class GoldHandler:
     def check_for_gold_ore_get_positions(self) -> list[Position] | None:
         logging.info('[Gold Handler] Checking for gold ore')
 
-        prediction = self.predictor.predict(conf=0.9)
+        prediction = self.predictor.predict(conf=0.85)
         gold_positions = [p.center for p in prediction.goldmine]
 
         if not gold_positions:
@@ -30,17 +30,22 @@ class GoldHandler:
     def get_current_gold_on_bar(self, region: Region = GOLD_REGION) -> int:
         logging.debug('[Gold Handler] Checking for current gold')
 
-        text = self.processor.tesseract.extract_strings_from_window_image(
-            threshold=220,
-            specific_region=region,
-            only_text=True
-        )
+        for threshold in [i for i in range(220, 175, -5)]:
 
-        for item in text:
-            if item in [str(x) for x in range(11)]:
-                logging.debug(f'[Gold Handler] Current gold: {item}')
-                return int(item)
+            text = self.processor.tesseract.extract_strings_from_window_image(
+                threshold=threshold,
+                specific_region=region,
+                only_text=True
+            )
 
+            for item in text:
+                if item in [str(x) for x in range(11)]:
+                    logging.debug(f'[Gold Handler] Current gold: {item}')
+                    return int(item)
+
+            sleep(0.2)
+
+        logging.error(f'[Gold Handler] did not find gold image')
         raise GoldNotFoundException
 
     def wait_until_enough_gold(self, gold: int) -> None:
@@ -49,10 +54,6 @@ class GoldHandler:
         interval = 0.5
         time_elapsed = 0
         total_time = 18
-        current_gold = self.get_current_gold_on_bar()
-
-        if current_gold == gold:
-            return
 
         while time_elapsed < total_time:
 
