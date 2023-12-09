@@ -1,11 +1,13 @@
-from ultralytics import YOLO
-from ultralytics.engine.results import Results
-import numpy as np
 import cv2
 import os
+import numpy as np
 from pathlib import Path
+from typing import Literal
+from ultralytics import YOLO
+from ultralytics.engine.results import Results
 from rumble_bot_api.predictor.data_objects import PredictionNode, PredictionCluster
 from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import Position
 
 
 CURR = Path(__file__).resolve().parent
@@ -61,3 +63,9 @@ class Predictor:
                         prediction_cluster.chest.append(temp_node)
 
         return prediction_cluster
+
+    def get_assets_on_map(self, asset: Literal['goldmine', 'arrow', 'enemy', 'chest']) -> list[Position] | None:
+        cluster = self.predict()
+        assets = cluster.get_prediction_asset(asset)
+        if assets:
+            return [obj.center for obj in assets]
