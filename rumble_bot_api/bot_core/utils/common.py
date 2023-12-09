@@ -10,7 +10,7 @@ HEROES_FOLDER = ASSETS_FOLDER / 'heroes'
 TOWER_IMAGE = ASSETS_FOLDER / 'other' / 'tower.png'
 MAP_ICON_IMAGE = ASSETS_FOLDER / 'other' / 'map.png'
 COLLECTION_ICON_IMAGE = ASSETS_FOLDER / 'other' / 'collection.png'
-ALLOWED_MINI_ARGS = ['no_skill', 'skill_1', 'skill_2', 'skill_3']
+ALLOWED_MINI_ARGS = ['skill_0', 'skill_1', 'skill_2', 'skill_3']
 
 COLLECTION_ELEMENT = ImageElement(
     name='collection_icon',
