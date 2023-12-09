@@ -4,6 +4,7 @@ from rumble_bot_api.desktop_automation_tool.utils.data_objects import StringElem
 
 class StringAssets(BaseModel):
     RUMBLE: StringElement = StringElement(string='rumble', threshold=200)
+    TOOLS: StringElement = StringElement(string='Tools', threshold=180, exact_match=True)
     RUMBLE_PVP: StringElement = StringElement(string='Rumble!', threshold=180, exact_match=True)
     PVP: StringElement = StringElement(string='pvp', threshold=200)
     CONTINUE: StringElement = StringElement(string='continue')

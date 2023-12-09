@@ -106,13 +106,15 @@ class BaseHandler:
         logging.info('[Error Handler] Checking if the game crashed')
 
         try:
-            location = self.tesseract.wait_for_element(STRING_ASSETS.RUMBLE, timeout=3)[0]
+            self.tesseract.wait_for_element(STRING_ASSETS.TOOLS, timeout=3)[0]
         except ElementNotFoundException:
             logging.error('[Error Handler] Game did not crash')
             return
 
         logging.error('[Error Handler] Game crashed, trying to login!')
-        self.actions.click(location)
+        locations = self.tesseract.wait_for_element(STRING_ASSETS.RUMBLE, timeout=3)
+        for loc in locations:
+            self.actions.click(loc)
         self.wait_for_load_state()
 
         if self._mode == 'quests':

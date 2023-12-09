@@ -2,31 +2,14 @@ from rumble_bot_api.desktop_automation_tool.debug_tool.debugger_tool import Debu
 from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.predictor.predictor_object import Predictor
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
+from rumble_bot_api.desktop_automation_tool.utils.common import find_root_dir
 from dataclasses import asdict
 from pathlib import Path
 import PySimpleGUI as sg
-import shutil
+
 
 ROOT = Path(__file__).resolve().parent
 MODELS = ROOT / 'predictor' / 'models'
-
-
-def find_root_dir() -> Path:
-    current_path = Path.cwd().resolve()
-    src = current_path / 'desktop_automation_tool' / 'extra' / 'config.yaml'
-
-    while True:
-        curr = current_path / 'venv'
-        if curr.exists() and current_path.is_dir():
-            dst = current_path / 'config.yaml'
-            if not dst.exists():
-                shutil.copy(src=src, dst=dst)
-            return current_path
-
-        if curr.name.lower() == 'users':
-            raise Exception('Could not find project root, please create a venv')
-
-        current_path = current_path.parent
 
 
 def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
