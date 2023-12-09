@@ -5,7 +5,6 @@ from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
-from rumble_bot_api.bot_core.handlers.error_handler import ErrorHandler
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException, GoldNotFoundException
 from rumble_bot_api.bot_core.utils.data_objects import MatchLineup
 
@@ -14,9 +13,9 @@ class QuestsHandler(BaseHandler):
 
     def __init__(self, processor: Processor, match_lineup: MatchLineup):
         super().__init__(processor)
-        self.error_handler = ErrorHandler(processor, 'quests')
         self.match_lineup = match_lineup
 
+        self.set_game_mode('quests')
         self.drop_handler.set_game_mode('quests')
         self.drop_handler.set_quests_lineup(match_lineup.lineup)
 
@@ -59,7 +58,7 @@ class QuestsHandler(BaseHandler):
     def init_quests(self) -> None:
         logging.info('[Quests Handler] Starting Quests')
 
-        if self.actions.wait_and_try_click_string_element(STRING_ASSETS.CLAIM, 4, ignore_exception=True):
+        if self.actions.wait_and_try_click_string_element(STRING_ASSETS.CLAIM, 3, ignore_exception=True):
             self.handle_level_up()
 
         self.actions.wait_and_try_click_string_element(STRING_ASSETS.QUEST)
@@ -70,21 +69,20 @@ class QuestsHandler(BaseHandler):
 
         self.match_mini_and_play_button_in_quest()
 
+        self.wait_for_load_state()
+
         self.set_game_state(GameState.QUESTS_MATCH_LOOP)
 
     def match_loop(self) -> None:
         logging.info('[Quests Handler] Starting a Quests Match')
 
-        self.wait_for_load_state()
-        self.tesseract.wait_for_element_state(STRING_ASSETS.START, state='visible', timeout=45)
+        self.tesseract.wait_for_element_state(STRING_ASSETS.START, state='visible', timeout=60)
 
         self.drop_handler.calculate_drop_zones_for_quests()
 
         self.actions.wait_and_try_click_string_element(STRING_ASSETS.START)
 
         self.wait_for_match_to_start()
-
-        self.set_game_state(GameState.QUESTS_MATCH_LOOP)
 
         curr_zone = self.drop_handler.drop_zones.LEFT
 
@@ -153,7 +151,7 @@ class QuestsHandler(BaseHandler):
 
         while True:
             try:
-                match self.current_state:
+                match self._current_state:
                     case GameState.INIT_QUESTS:
                         self.init_quests()
                     case GameState.QUESTS_MATCH_LOOP:
@@ -161,8 +159,7 @@ class QuestsHandler(BaseHandler):
                     case GameState.QUESTS_GAME_FINISH:
                         self.match_finish()
                     case GameState.ERROR_STATE:
-                        self.error_handler.handler_errors()
+                        self.handler_errors()
             except Exception as e:
                 logging.error(f'Something went wrong: {e}')
-                state = self.error_handler.handler_errors()
-                self.set_game_state(state)
+                self.set_game_state(GameState.ERROR_STATE)

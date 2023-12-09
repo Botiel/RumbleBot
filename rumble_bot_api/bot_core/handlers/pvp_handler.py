@@ -5,7 +5,6 @@ from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
-from rumble_bot_api.bot_core.handlers.error_handler import ErrorHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
 from rumble_bot_api.bot_core.utils.data_objects import MatchLineup
@@ -16,9 +15,9 @@ class PvpHandler(BaseHandler):
     def __init__(self, processor: Processor, match_lineup: MatchLineup, pvp_logic: Callable):
         super().__init__(processor)
 
-        self.error_handler = ErrorHandler(processor, 'quests')
         self.match_lineup = match_lineup
 
+        self.set_game_mode('pvp')
         self.drop_handler.set_game_mode('pvp')
         self.drop_handler.set_pvp_lineup(match_lineup.lineup)
         self.pvp_logic = pvp_logic
@@ -86,7 +85,7 @@ class PvpHandler(BaseHandler):
 
         while True:
             try:
-                match self.current_state:
+                match self._current_state:
                     case GameState.INIT_PVP:
                         self.init_pvp()
                     case GameState.PVP_MATCH_LOOP:
@@ -94,8 +93,7 @@ class PvpHandler(BaseHandler):
                     case GameState.PVP_GAME_FINISH:
                         self.match_finish()
                     case GameState.ERROR_STATE:
-                        self.error_handler.handler_errors()
+                        self.handler_errors()
             except Exception as e:
                 logging.error(f'Something went wrong: {e}')
-                state = self.error_handler.handler_errors()
-                self.set_game_state(state)
+                self.set_game_state(GameState.ERROR_STATE)
