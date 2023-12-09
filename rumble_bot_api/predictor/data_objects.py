@@ -36,3 +36,19 @@ class PredictionCluster:
     arrow: list[PredictionNode] = field(default_factory=list)
     enemy: list[PredictionNode] = field(default_factory=list)
     chest: list[PredictionNode] = field(default_factory=list)
+
+    def get_prediction_asset(self, name: str) -> list[PredictionNode]:
+
+        match name:
+            case 'goldmine':
+                assets = self.goldmine
+            case 'arrow':
+                assets = self.arrow
+            case 'enemy':
+                assets = self.enemy
+            case 'chest':
+                assets = self.chest
+            case _:
+                raise ValueError(f'there is no such asset: {name}')
+
+        return assets
