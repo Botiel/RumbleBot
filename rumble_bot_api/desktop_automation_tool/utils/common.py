@@ -58,3 +58,8 @@ def find_root_dir() -> Path:
             raise Exception('Could not find project root, please create a venv')
 
         current_path = current_path.parent
+
+
+def get_yaml_file_path() -> Path:
+    project_dir = find_root_dir()
+    return project_dir / 'config.yaml'
