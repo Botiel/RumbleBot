@@ -7,7 +7,8 @@ from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
-from typing import Literal
+from rumble_bot_api.bot_core.utils.data_objects import MatchObject
+from typing import Literal, Optional
 
 
 class BaseHandler:
@@ -19,9 +20,16 @@ class BaseHandler:
         self.image_processing = processor.image_processing
         self.actions = processor.actions
 
-        self.drop_handler = DropHandler(processor)
+        self.drop_handler: Optional[DropHandler] = None
+        self.match_object: Optional[MatchObject] = None
         self._current_state = None
         self._mode = None
+
+    # ------------------------------------------------- SETTERS --------------------------------------------------------
+    def set_match_object(self, match_object: MatchObject) -> None:
+        logging.info('[Drop Handler] setting up match object and drop handler')
+        self.match_object = match_object
+        self.drop_handler = DropHandler(self._processor, match_object.lineup)
 
     def set_game_state(self, state: GameState) -> None:
         logging.info(f'[Base Handler] state is set to: {state.value}')
@@ -35,6 +43,7 @@ class BaseHandler:
         logging.info(f'[Base Handler] game mode is set to: {mode}')
         self._mode = mode
 
+    # ------------------------------------------------- GENERAL --------------------------------------------------------
     def wait_for_load_state(self, wait_time: int = 45) -> None:
         logging.info('[Loading State] Loading...')
         self.tesseract.wait_for_element_state(
@@ -61,7 +70,7 @@ class BaseHandler:
         self.actions.click_string_element_until_hidden(STRING_ASSETS.LEVEL_UP)
 
     def wait_for_match_to_start(self, timeout: float = 40, intervals: float = 0.5) -> None:
-        logging.info(f'[Base Handler] Waiting for the match to start: {self.drop_handler.game_mode}')
+        logging.info(f'[Base Handler] Waiting for the match to start: {self._mode}')
 
         timer = 0
 

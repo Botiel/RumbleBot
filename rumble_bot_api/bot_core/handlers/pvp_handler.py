@@ -1,26 +1,18 @@
 import logging
 from time import sleep, time
-from typing import Callable
 from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
-from rumble_bot_api.bot_core.utils.data_objects import MatchLineup
 
 
 class PvpHandler(BaseHandler):
 
-    def __init__(self, processor: Processor, match_lineup: MatchLineup, pvp_logic: Callable):
+    def __init__(self, processor: Processor):
         super().__init__(processor)
-
-        self.match_lineup = match_lineup
-
         self.set_game_mode('pvp')
-        self.drop_handler.set_game_mode('pvp')
-        self.drop_handler.set_pvp_lineup(match_lineup.lineup)
-        self.pvp_logic = pvp_logic
 
     def init_pvp(self) -> None:
         logging.info('[PvP Handler] Initializing PVP match')
@@ -44,7 +36,7 @@ class PvpHandler(BaseHandler):
 
         while True:
             try:
-                self.pvp_logic()
+                self.drop_handler.match_object.pvp_logic()
             except (ElementNotFoundException, NoMinisOnBoardException):
                 self.set_game_state(GameState.PVP_GAME_FINISH)
                 return
