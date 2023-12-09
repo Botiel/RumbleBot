@@ -10,9 +10,9 @@ GOLD_REGION = Region(top_left=Position(x=330, y=970), bottom_right=Position(x=38
 
 class GoldHandler:
 
-    def __init__(self, processor: Processor):
+    def __init__(self, processor: Processor, predictor: Predictor):
         self.processor = processor
-        self.predictor = Predictor(processor.window, processor.yaml_config)
+        self.predictor = predictor
 
     def check_for_gold_ore_get_positions(self) -> list[Position] | None:
         logging.info('[Gold Handler] Checking for gold ore')

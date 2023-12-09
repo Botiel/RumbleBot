@@ -1,15 +1,15 @@
 import logging
-import sys
 from random import choice
-from typing import Optional, Literal
+from typing import Optional
 from dataclasses import dataclass
 from rumble_bot_api.desktop_automation_tool import Processor, Position
 from rumble_bot_api.bot_core.mini_assets import MINI_ASSETS
 from rumble_bot_api.bot_core.utils.common import TOWER_IMAGE
-from rumble_bot_api.bot_core.utils.data_objects import Node
+from rumble_bot_api.predictor.predictor_object import Predictor
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ImageNotFoundException
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
+from rumble_bot_api.bot_core.utils.data_objects import Node
 
 
 @dataclass(kw_only=True)
@@ -22,37 +22,17 @@ class DropZone:
 
 class DropHandler:
 
-    def __init__(self, processor: Processor):
+    def __init__(self, processor: Processor, lineup: list[Node]):
         self.processor = processor
-        self.gold_handler = GoldHandler(processor)
+        self.predictor = Predictor(processor.window, processor.yaml_config)
+        self.gold_handler = GoldHandler(processor, self.predictor)
 
         # Settings
+        self.lineup = lineup
         self.tower_center: Optional[Position] = None
         self.drop_zones: Optional[DropZone] = None
-        self.game_mode: Optional[str] = None
-        self.quests_lineup: Optional[list[Node]] = None
-        self.pvp_lineup: Optional[list[Node]] = None
-
-    # --------------------- SETTERS ---------------------------
-    def set_quests_lineup(self, lineup: list[Node]) -> None:
-        logging.info('[Drop Handler] setting up quests lineup')
-        self.quests_lineup = lineup
-
-    def set_pvp_lineup(self, lineup: list[Node]) -> None:
-        logging.info('[Drop Handler] setting up pvp lineup')
-        self.pvp_lineup = lineup
-        self.pvp_lineup.append(MINI_ASSETS.miner.skill_0)
-
-    def set_game_mode(self, game_mode: Literal['pvp', 'quests']) -> None:
-
-        if game_mode not in ['pvp', 'quests']:
-            raise ValueError(f'No such game mode: {game_mode}')
-
-        logging.info(f'[Drop Handler] setting up game mode: {game_mode}')
-        self.game_mode = game_mode
 
     # ------------------- CALCULATIONS ------------------------
-
     def init_tower_center_by_pixels(self, tower_ssim: float = 0.6) -> None:
         x, y, ssim = self.processor.image_processing.find_object_on_screen_get_coordinates(image_path=str(TOWER_IMAGE))
         if ssim > tower_ssim:
@@ -82,23 +62,8 @@ class DropHandler:
 
     def get_current_minis_on_board(self) -> dict:
         results = {}
-        lineup = None
 
-        if not self.game_mode:
-            logging.error('[Drop Handler] game mode is not set!')
-            sys.exit(1)
-
-        if self.game_mode == 'pvp':
-            lineup = self.pvp_lineup
-
-        if self.game_mode == 'quests':
-            lineup = self.quests_lineup
-
-        if not lineup:
-            logging.error('[Drop Handler] lineups are not set!')
-            sys.exit(1)
-
-        for mini in lineup:
+        for mini in self.lineup:
             x, y, ssim = self.processor.image_processing.find_object_on_screen_get_coordinates(
                 image_path=mini.path,
                 specific_region=MINI_ASSETS.region
@@ -107,9 +72,20 @@ class DropHandler:
                 results.update({mini.name: [Position(x=x, y=y), mini.cost]})
         return results
 
+    def drop_mini(self, mini: tuple[Position, int], dropzone: Position) -> bool:
+
+        pos, cost = mini
+
+        self.gold_handler.wait_until_enough_gold(cost)
+        before_gold_count = self.gold_handler.get_current_gold_on_bar()
+        self.processor.actions.drag_and_drop(pos, dropzone, wait_after_drop=0.5)
+        after_gold_count = self.gold_handler.get_current_gold_on_bar()
+
+        return before_gold_count > after_gold_count
+
     # -------------------- MINIS DROP --------------------------
 
-    def drop_mini(self, mini: str, dropzone: Position) -> bool:
+    def drop_mini_for_quests(self, mini: str, dropzone: Position) -> bool:
 
         current_minis = self.get_current_minis_on_board()
 
@@ -122,14 +98,7 @@ class DropHandler:
             logging.info(f'[Drop Handler] Did not find mini on board: {mini}')
             return False
 
-        mini_position, cost = result
-
-        self.gold_handler.wait_until_enough_gold(cost)
-        before_gold_count = self.gold_handler.get_current_gold_on_bar()
-        self.processor.actions.drag_and_drop(mini_position, dropzone, wait_after_drop=0.5)
-        after_gold_count = self.gold_handler.get_current_gold_on_bar()
-
-        return before_gold_count > after_gold_count
+        return self.drop_mini(result, dropzone)
 
     def drop_miner_for_quests(self) -> bool:
 
@@ -151,15 +120,11 @@ class DropHandler:
             logging.info('[Drop Handler] Did not find gold ore')
             return False
 
-        if self.game_mode is None:
-            logging.error('[Drop Handler] game mode is not set!')
-            sys.exit(1)
+        gold_pos = choice(gold_positions)
+        if gold_pos.x > self.tower_center.x:
+            zone = self.drop_zones.RIGHT
         else:
-            gold_pos = choice(gold_positions)
-            if gold_pos.x > self.tower_center.x:
-                zone = self.drop_zones.RIGHT
-            else:
-                zone = self.drop_zones.LEFT
+            zone = self.drop_zones.LEFT
 
         self.gold_handler.wait_until_enough_gold(1)
         before_gold_count = self.gold_handler.get_current_gold_on_bar()

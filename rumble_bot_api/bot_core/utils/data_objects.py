@@ -1,6 +1,7 @@
 from pprint import pprint
 from pydantic import BaseModel, Field
 from enum import Enum
+from typing import Callable
 from rumble_bot_api.bot_core.utils.common import MINIS_FOLDER
 
 
@@ -22,21 +23,24 @@ class Node(BaseModel):
 
 class Asset(BaseModel):
     name: str = Field(default=None)
+    is_unbound: bool = Field(default=None)
     skill_0: Node = Field(default=None)
     skill_1: Node = Field(default=None)
     skill_2: Node = Field(default=None)
     skill_3: Node = Field(default=None)
 
 
-class MatchLineup(BaseModel):
+class MatchObject(BaseModel):
     lineup: list[Node]
     hero: Asset
     levelup_list: list[Asset] | None = None
+    pvp_logic: Callable = None
 
 
-def create_asset(name: str, cost: int, changed_cost: dict = None) -> Asset:
+def create_asset(name: str, cost: int, is_unbound: bool = False, changed_cost: dict = None) -> Asset:
     temp = {
         'name': name,
+        'is_unbound': is_unbound,
         'skill_0': {
             'path': str(MINIS_FOLDER / f'{name}_0.png'),
             'cost': cost,
