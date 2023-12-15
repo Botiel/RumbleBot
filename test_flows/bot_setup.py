@@ -1,31 +1,11 @@
-from rumble_bot_api import MINIS, BotApi, Position
-from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
+from rumble_bot_api import MINIS, BaseBotSetup, Position, NoMinisOnBoardException
+from test_flows.test_linups import BARON_PVE, TIRION_PVP
 
 
-class BotSetup(BotApi):
-    # =================== QUESTS =====================
-    QUESTS_HERO = MINIS.tirion_fordring
-    QUEST_LINEUP = [
-        MINIS.darkspear_troll.skill_1,
-        MINIS.quilboar.skill_0,
-        MINIS.huntress.skill_1,
-        MINIS.defias_bandits.skill_0,
-        MINIS.dark_iron_miner.skill_0,
-        MINIS.harpies.skill_1,
-        MINIS.tirion_fordring.skill_0
-    ]
+class BotSetup(BaseBotSetup):
 
-    # ==================== PVP =======================
-    PVP_HERO = MINIS.tirion_fordring
-    PVP_LINEUP = [
-        MINIS.darkspear_troll.skill_1,
-        MINIS.ghoul.skill_1,
-        MINIS.huntress.skill_1,
-        MINIS.gryphon_rider.skill_1,
-        MINIS.dark_iron_miner.skill_0,
-        MINIS.harpies.skill_1,
-        MINIS.tirion_fordring.skill_0
-    ]
+    QUESTS_SETUP = BARON_PVE
+    PVP_SETUP = TIRION_PVP
 
     TOWER_RIGHT = Position(x=620, y=790)
     TOWER_LEFT = Position(x=390, y=790)
@@ -59,10 +39,20 @@ class BotSetup(BotApi):
 
     def drop_miners(self) -> None:
 
-        current = self.get_current_minis()
+        while True:
+            current = self.get_current_minis()
+            if len(current) == 4:
+                break
+            if not current:
+                raise NoMinisOnBoardException
+
         dark_miner = self.check_for_mini(MINIS.dark_iron_miner, current)
         miner = self.check_for_mini(MINIS.miner, current)
-        upper_top_ore, bottom_top_ore, bottom_ore = self.get_gold_ores()
+
+        if dark_miner or miner:
+            upper_top_ore, bottom_top_ore, bottom_ore = self.get_gold_ores()
+        else:
+            return
 
         if dark_miner:
             if upper_top_ore:

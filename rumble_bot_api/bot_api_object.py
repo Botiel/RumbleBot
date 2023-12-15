@@ -1,26 +1,18 @@
-import logging
-
 from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.desktop_automation_tool.utils.common import get_yaml_file_path
 from rumble_bot_api.bot_core.handlers.quests_handler import QuestsHandler
 from rumble_bot_api.bot_core.handlers.pvp_handler import PvpHandler
 from rumble_bot_api.bot_core.utils.data_objects import PvpMatchObject, QuestsMatchObject
-from rumble_bot_api.bot_core.mini_assets import MINI_ASSETS
-from rumble_bot_api.bot_core.utils.common import set_logger
 from rumble_bot_api.bot_core.utils.data_objects import Asset
+from typing import Optional
 
 
-class BotApi:
+class BaseBotSetup:
 
-    QUESTS_HERO = None
-    QUEST_LINEUP = []
-    LEVELUP_LIST = []
-
-    PVP_HERO = None
-    PVP_LINEUP = []
+    QUESTS_SETUP: Optional[QuestsMatchObject] = None
+    PVP_SETUP: Optional[PvpMatchObject] = None
 
     def __init__(self):
-        set_logger()
         self._yaml_file = get_yaml_file_path()
         self._processor = Processor(self._yaml_file)
         self._quests_handler = QuestsHandler(self._processor)
@@ -40,22 +32,19 @@ class BotApi:
         self.click = self._processor.actions.click
 
     def _setup_quests(self) -> None:
-        quests_setup = QuestsMatchObject(
-            hero=self.QUESTS_HERO,
-            lineup=self.QUEST_LINEUP,
-            levelup_list=self.LEVELUP_LIST
-        )
-        self._quests_handler.set_quests_match_object(quests_setup)
+        if not self.QUESTS_SETUP:
+            raise ValueError('Quests match object is not set!')
+        self._quests_handler.set_quests_match_object(self.QUESTS_SETUP)
 
     def _setup_pvp(self) -> None:
-        pvp_setup = PvpMatchObject(
-            hero=self.PVP_HERO,
-            lineup=self.PVP_LINEUP,
-            drop_logic=self.pvp_drop_logic,
-            click_arrows_before_match=self.click_arrows_before_match,
-            scroll_up_before_match=self.scroll_up_before_match
-        )
-        self._pvp_handler.set_pvp_match_object(pvp_setup)
+        if not self.PVP_SETUP:
+            raise ValueError('PvP match object is not set!')
+
+        self.PVP_SETUP.drop_logic = self.pvp_drop_logic
+        self.PVP_SETUP.click_arrows_before_match = self.click_arrows_before_match
+        self.PVP_SETUP.scroll_up_before_match = self.scroll_up_before_match
+
+        self._pvp_handler.set_pvp_match_object(self.PVP_SETUP)
 
     def pvp_drop_logic(self) -> None:
         pass

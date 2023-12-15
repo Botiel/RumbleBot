@@ -82,7 +82,7 @@ class QuestsHandler(BaseHandler):
         logging.info('[Quests Handler] Starting a Quests Match')
 
         self.tesseract.wait_for_element_state(STRING_ASSETS.START, state='visible', timeout=60)
-        self.actions.wait_and_try_click_string_element(STRING_ASSETS.START, timeout=2)
+        self.actions.wait_and_try_click_string_element(STRING_ASSETS.START, timeout_after_click=2.5)
 
         self.drop_handler.calculate_drop_zones_for_quests()
 
