@@ -6,6 +6,9 @@ from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException, GoldNotFoundException
+from rumble_bot_api.bot_core.utils.data_objects import QuestsMatchObject
+from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
+from typing import Optional
 
 
 class QuestsHandler(BaseHandler):
@@ -13,6 +16,13 @@ class QuestsHandler(BaseHandler):
     def __init__(self, processor: Processor):
         super().__init__(processor)
         self.set_game_mode('quests')
+        self.match_object: Optional[QuestsMatchObject] = None
+
+    def set_quests_match_object(self, match_object: QuestsMatchObject) -> None:
+        logging.info('[Quests Handler] setting up quests match object and drop handler')
+        logging.debug(f'[Quests Handler] lineup: {match_object.lineup}')
+        self.match_object = match_object
+        self.drop_handler = DropHandler(self._processor, match_object.lineup)
 
     def match_mini_and_play_button_in_quest(self) -> None:
         logging.info('[Quests Handler] Matching minions in quest to buttons')
@@ -72,10 +82,9 @@ class QuestsHandler(BaseHandler):
         logging.info('[Quests Handler] Starting a Quests Match')
 
         self.tesseract.wait_for_element_state(STRING_ASSETS.START, state='visible', timeout=60)
+        self.actions.wait_and_try_click_string_element(STRING_ASSETS.START, timeout=2)
 
         self.drop_handler.calculate_drop_zones_for_quests()
-
-        self.actions.wait_and_try_click_string_element(STRING_ASSETS.START)
 
         self.wait_for_match_to_start()
 
@@ -105,7 +114,7 @@ class QuestsHandler(BaseHandler):
 
             error = [
                 self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.ERROR),
-                self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.RUMBLE)
+                self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.TOOLS)
 
             ]
             if any(error):

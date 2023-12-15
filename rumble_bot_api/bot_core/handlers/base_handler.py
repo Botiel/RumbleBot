@@ -4,10 +4,10 @@ import sys
 from rumble_bot_api.bot_core.utils.custom_exceptions import GoldNotFoundException
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
-from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
-from rumble_bot_api.bot_core.utils.data_objects import MatchObject
+from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
+
 from typing import Literal, Optional
 
 
@@ -21,16 +21,10 @@ class BaseHandler:
         self.actions = processor.actions
 
         self.drop_handler: Optional[DropHandler] = None
-        self.match_object: Optional[MatchObject] = None
         self._current_state = None
         self._mode = None
 
     # ------------------------------------------------- SETTERS --------------------------------------------------------
-    def set_match_object(self, match_object: MatchObject) -> None:
-        logging.info('[Drop Handler] setting up match object and drop handler')
-        self.match_object = match_object
-        self.drop_handler = DropHandler(self._processor, match_object.lineup)
-
     def set_game_state(self, state: GameState) -> None:
         logging.info(f'[Base Handler] state is set to: {state.value}')
         self._current_state = state

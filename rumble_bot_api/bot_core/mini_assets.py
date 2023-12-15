@@ -26,6 +26,9 @@ class MiniAssets(BaseModel):
     quilboar: Asset = create_asset('quilboar', cost=2, is_unbound=True)
     tirion_fordring: Asset = create_asset('tirion_fordring', cost=4)
     huntress: Asset = create_asset('huntress', cost=5)
+    dark_iron_miner: Asset = create_asset('dark_iron_miner', cost=2, is_unbound=True)
+    footmen: Asset = create_asset('footmen', cost=5)
+    defias_bandits: Asset = create_asset('defias_bandits', cost=1)
 
 
 MINI_ASSETS = MiniAssets()

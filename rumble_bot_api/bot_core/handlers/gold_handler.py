@@ -17,7 +17,7 @@ class GoldHandler:
     def check_for_gold_ore_get_positions(self) -> list[Position] | None:
         logging.info('[Gold Handler] Checking for gold ore')
 
-        prediction = self.predictor.predict(conf=0.85)
+        prediction = self.predictor.predict()
         gold_positions = [p.center for p in prediction.goldmine]
 
         if not gold_positions:
@@ -27,7 +27,7 @@ class GoldHandler:
         logging.debug(f'[Gold Handler] Found gold ores: {gold_positions}')
         return gold_positions
 
-    def get_current_gold_on_bar(self, region: Region = GOLD_REGION) -> int:
+    def get_current_gold_on_bar(self, region: Region = GOLD_REGION, timeout: float = 0.2) -> int:
         logging.debug('[Gold Handler] Checking for current gold')
 
         for threshold in [i for i in range(220, 175, -5)]:
@@ -43,7 +43,7 @@ class GoldHandler:
                     logging.debug(f'[Gold Handler] Current gold: {item}')
                     return int(item)
 
-            sleep(0.2)
+            sleep(timeout)
 
         logging.error(f'[Gold Handler] did not find gold image')
         raise GoldNotFoundException
