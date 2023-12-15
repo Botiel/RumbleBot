@@ -70,6 +70,8 @@ class DropHandler:
             )
             if ssim > MINI_ASSETS.ssim:
                 results.update({mini.name: [Position(x=x, y=y), mini.cost]})
+
+        logging.info(f'Current Minis On Board: {results}')
         return results
 
     def drop_mini(self, mini: tuple[Position, int], dropzone: Position) -> bool:

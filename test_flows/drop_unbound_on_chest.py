@@ -1,11 +1,11 @@
 from rumble_bot_api.bot_core.handlers.quests_handler import QuestsHandler
 from rumble_bot_api.bot_core.mini_assets import MINI_ASSETS
-from rumble_bot_api.bot_core.utils.data_objects import MatchObject
+from rumble_bot_api.bot_core.utils.data_objects import QuestsMatchObject
 from test_flows.utils import init_processor
 
 if __name__ == '__main__':
 
-    match_setup = MatchObject(
+    match_setup = QuestsMatchObject(
         hero=MINI_ASSETS.baron_rivendare,
         lineup=[
             MINI_ASSETS.stonehoof_tauren.skill_0,
@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     p = init_processor()
     q = QuestsHandler(p)
-    q.set_match_object(match_setup)
+    q.set_quests_match_object(match_setup)
 
     chests = q.drop_handler.predictor.get_assets_on_map(asset='chest')
     if chests:

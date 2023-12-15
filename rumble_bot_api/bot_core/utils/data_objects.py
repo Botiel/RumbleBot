@@ -30,11 +30,18 @@ class Asset(BaseModel):
     skill_3: Node = Field(default=None)
 
 
-class MatchObject(BaseModel):
+class QuestsMatchObject(BaseModel):
     lineup: list[Node]
     hero: Asset
-    levelup_list: list[Asset] | None = None
-    pvp_logic: Callable = None
+    levelup_list: list[Asset] = []
+
+
+class PvpMatchObject(BaseModel):
+    lineup: list[Node]
+    hero: Asset
+    drop_logic: Callable = None
+    click_arrows_before_match: Callable = None
+    scroll_up_before_match: Callable = None
 
 
 def create_asset(name: str, cost: int, is_unbound: bool = False, changed_cost: dict = None) -> Asset:
