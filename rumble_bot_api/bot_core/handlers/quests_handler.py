@@ -63,26 +63,26 @@ class QuestsHandler(BaseHandler):
     def init_quests(self) -> None:
         logging.info('[Quests Handler] Starting Quests')
 
-        if self.actions.wait_and_try_click_string_element(STRING_ASSETS.CLAIM, 3, ignore_exception=True):
+        if self.actions.wait_and_try_click_string_element(STRING_ASSETS.CLAIM, ignore_exception=True):
+            self.handle_level_up()
+
+        elif self.actions.wait_and_try_click_string_element(STRING_ASSETS.CLAIM_AFTER_QUEST, 3, ignore_exception=True):
+            self.actions.wait_and_try_click_string_element(STRING_ASSETS.CLAIM)
             self.handle_level_up()
 
         self.actions.wait_and_try_click_string_element(STRING_ASSETS.QUEST)
 
-        if self.actions.wait_and_try_click_string_element(STRING_ASSETS.CLAIM, 2, ignore_exception=True):
-            self.handle_level_up()
-            self.actions.wait_and_try_click_string_element(STRING_ASSETS.QUEST)
-
         self.match_mini_and_play_button_in_quest()
-
-        self.wait_for_load_state()
 
         self.set_game_state(GameState.QUESTS_MATCH_LOOP)
 
     def match_loop(self) -> None:
         logging.info('[Quests Handler] Starting a Quests Match')
 
+        self.wait_for_load_state()
+
         self.tesseract.wait_for_element_state(STRING_ASSETS.START, state='visible', timeout=60)
-        self.actions.wait_and_try_click_string_element(STRING_ASSETS.START, timeout_after_click=2.5)
+        self.actions.wait_and_try_click_string_element(STRING_ASSETS.START, timeout_after_click=2)
 
         self.drop_handler.calculate_drop_zones_for_quests()
 
