@@ -29,6 +29,8 @@ class MiniAssets(BaseModel):
     dark_iron_miner: Asset = create_asset('dark_iron_miner', cost=2, is_unbound=True)
     footmen: Asset = create_asset('footmen', cost=5)
     defias_bandits: Asset = create_asset('defias_bandits', cost=1)
+    hogger: Asset = create_asset('hogger', cost=4)
+    murloc_tidehunters: Asset = create_asset('murloc_tidehunters', cost=2)
 
 
 MINI_ASSETS = MiniAssets()
