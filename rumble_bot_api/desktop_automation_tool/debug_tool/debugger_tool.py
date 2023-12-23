@@ -54,7 +54,7 @@ class DebuggerTool:
             return
 
         try:
-            pixel_color = pyautogui.screenshot().getpixel((x, y))
+            pixel_color = pyautogui.pixel(x, y)
             hex_color = '#{:02x}{:02x}{:02x}'.format(pixel_color[0], pixel_color[1], pixel_color[2])
             self.window['-COLOR-'].update(hex_color)
         except Exception as e:

@@ -37,10 +37,6 @@ class ImageProcessing:
         gray_object = cv2.cvtColor(image_object, cv2.COLOR_BGR2GRAY)
         gray_screen = cv2.cvtColor(image_screen, cv2.COLOR_BGR2GRAY)
 
-        if threshold:
-            _, gray_object = cv2.threshold(gray_object, threshold, 255, cv2.THRESH_BINARY)
-            _, gray_screen = cv2.threshold(gray_screen, threshold, 255, cv2.THRESH_BINARY)
-
         result = cv2.matchTemplate(gray_screen, gray_object, cv2.TM_CCOEFF_NORMED)
 
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
@@ -56,8 +52,6 @@ class ImageProcessing:
         if self._save_image:
             output = get_folder(self._yaml_config, 'output')
             cv2.imwrite(str(output / 'detected_object.jpg'), image_screen)
-            cv2.imwrite(str(output / 'thresholded_screen.jpg'), gray_screen)
-            cv2.imwrite(str(output / 'thresholded_object.jpg'), gray_object)
 
         return center[0], center[1], matching_score
 

@@ -89,10 +89,23 @@ class BaseHandler:
     def check_for_error_message(self) -> GameState | None:
         logging.info('[Error Handler] Checking for error message')
 
+        is_error = False
+
         try:
             self.tesseract.wait_for_element_state(STRING_ASSETS.ERROR, state='visible', timeout=3)
         except ElementNotFoundException:
-            logging.info('[Error Handler] No error message')
+            logging.info('[Error Handler] No Error message')
+        else:
+            is_error = True
+
+        try:
+            self.tesseract.wait_for_element_state(STRING_ASSETS.FAILED, state='visible', timeout=3)
+        except ElementNotFoundException:
+            logging.info('[Error Handler] No Failed message')
+        else:
+            is_error = True
+
+        if not is_error:
             return
 
         logging.info('[Error Handler] Error found, handling error!')

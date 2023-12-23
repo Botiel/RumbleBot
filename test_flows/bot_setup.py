@@ -1,15 +1,16 @@
 from rumble_bot_api import MINIS, BaseBotSetup, Position, NoMinisOnBoardException
-from test_flows.test_linups import BARON_PVE, TIRION_PVP
+from test_flows.test_linups import TIRION_PVE, BARON_PVP, SYLVANA_PVE, BARON_PVE
 
 
 class BotSetup(BaseBotSetup):
 
     QUESTS_SETUP = BARON_PVE
-    PVP_SETUP = TIRION_PVP
+    PVP_SETUP = BARON_PVP
 
-    TOWER_RIGHT = Position(x=620, y=790)
-    TOWER_LEFT = Position(x=390, y=790)
-    TOP_RIGHT_TOWER = Position(x=790, y=510)
+    TOWER_RIGHT = Position(x=600, y=790)
+    TOWER_LEFT = Position(x=410, y=790)
+    TOP_TOWER_RIGHT = Position(x=790, y=510)
+    MIDDLE = Position(x=570, y=250)
 
     def click_arrows_before_match(self):
         arrows = self.get_assets_on_map('arrow')
@@ -64,7 +65,7 @@ class BotSetup(BaseBotSetup):
 
         if miner:
             if bottom_ore:
-                self.drop_mini(miner, self.TOP_RIGHT_TOWER)
+                self.drop_mini(miner, self.TOP_TOWER_RIGHT)
             elif (upper_top_ore or bottom_top_ore) and not dark_miner:
                 self.drop_mini(miner, self.TOWER_LEFT)
 
@@ -74,13 +75,52 @@ class BotSetup(BaseBotSetup):
         if not current_minis:
             raise NoMinisOnBoardException
 
+        self.baron_pvp(current_minis)
+
+    # --------------------------------------------- DECKS --------------------------------------------------------------
+    def tirion_pvp(self, current_minis: dict):
+
         order = [
             [MINIS.ghoul, self.TOWER_LEFT],
             [MINIS.darkspear_troll, self.TOWER_LEFT],
-            [MINIS.huntress, self.TOP_RIGHT_TOWER],
+            [MINIS.huntress, self.TOP_TOWER_RIGHT],
             [MINIS.tirion_fordring, self.TOWER_RIGHT],
             [MINIS.harpies, self.TOWER_LEFT],
-            [MINIS.gryphon_rider, self.TOP_RIGHT_TOWER]
+            [MINIS.gryphon_rider, self.TOP_TOWER_RIGHT]
+        ]
+
+        for mini, side in order:
+            is_mini = self.check_for_mini(mini, current_minis)
+            if is_mini:
+                self.drop_mini(is_mini, side)
+                self.drop_miners()
+
+    def hogger_pvp(self, current_minis: dict):
+
+        order = [
+            [MINIS.hogger, self.TOWER_LEFT],
+            [MINIS.darkspear_troll, self.TOWER_LEFT],
+            [MINIS.prowler, self.TOWER_RIGHT],
+            [MINIS.gryphon_rider, self.TOP_TOWER_RIGHT],
+            [MINIS.murloc_tidehunters, self.TOWER_LEFT],
+            [MINIS.quilboar, self.MIDDLE]
+        ]
+
+        for mini, side in order:
+            is_mini = self.check_for_mini(mini, current_minis)
+            if is_mini:
+                self.drop_mini(is_mini, side)
+                self.drop_miners()
+
+    def baron_pvp(self, current_minis: dict):
+
+        order = [
+            [MINIS.huntress, self.TOWER_LEFT],
+            [MINIS.ghoul, self.TOWER_LEFT],
+            [MINIS.necromancer, self.TOWER_RIGHT],
+            [MINIS.darkspear_troll, self.TOWER_LEFT],
+            [MINIS.harpies, self.TOWER_RIGHT],
+            [MINIS.baron_rivendare, self.TOWER_RIGHT]
         ]
 
         for mini, side in order:

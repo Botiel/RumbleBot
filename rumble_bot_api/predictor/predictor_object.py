@@ -3,6 +3,7 @@ import os
 import numpy as np
 from pathlib import Path
 from typing import Literal
+from time import perf_counter
 from ultralytics import YOLO
 from ultralytics.engine.results import Results
 from rumble_bot_api.predictor.data_objects import PredictionNode, PredictionCluster
@@ -26,6 +27,8 @@ class Predictor:
 
     def predict(self, image: str | np.ndarray = None, conf: float = 0.8, save: bool = False) -> PredictionCluster:
 
+        start = perf_counter()
+
         if isinstance(image, str):
             image = cv2.imread(image)
 
@@ -38,6 +41,7 @@ class Predictor:
             source=image,
             conf=conf,
             save=save,
+            device=0,
             project=self.output_dir
         )
 
@@ -61,6 +65,10 @@ class Predictor:
                         prediction_cluster.enemy.append(temp_node)
                     case 'chest':
                         prediction_cluster.chest.append(temp_node)
+
+        end = perf_counter()
+        delta = end - start
+        print(f"Detection time: {delta:.4f} seconds")
 
         return prediction_cluster
 

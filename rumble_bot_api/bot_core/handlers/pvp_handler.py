@@ -65,6 +65,7 @@ class PvpHandler(BaseHandler):
 
             error = [
                 self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.ERROR),
+                self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.FAILED),
                 self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.TOOLS)
             ]
             if any(error):
