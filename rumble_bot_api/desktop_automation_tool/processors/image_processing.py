@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import logging
-from rumble_bot_api.desktop_automation_tool.utils.common import get_folder
+from rumble_bot_api.desktop_automation_tool.utils.common import get_output_folder
 from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
 from rumble_bot_api.desktop_automation_tool.utils.data_objects import ImageElement, Region, ImagePosition
 from skimage.metrics import structural_similarity as ssim
@@ -9,10 +9,10 @@ from skimage.metrics import structural_similarity as ssim
 
 class ImageProcessing:
 
-    def __init__(self, window: WindowObject, yaml_config: dict):
-        self._yaml_config = yaml_config
+    def __init__(self, window: WindowObject):
         self.window = window
         self._save_image = False
+        self._output_folder = get_output_folder()
 
     def set_save_image_on(self) -> None:
         logging.info('[Image Processing] Image saving is ON')
@@ -25,7 +25,6 @@ class ImageProcessing:
     def find_object_on_screen_get_coordinates(
             self,
             image_path: str,
-            threshold: int = None,
             specific_region: Region = None,
     ) -> tuple[int, int, float]:
 
@@ -50,18 +49,28 @@ class ImageProcessing:
         matching_score = ssim(gray_object, found_object)
 
         if self._save_image:
-            output = get_folder(self._yaml_config, 'output')
+            output = self._output_folder
             cv2.imwrite(str(output / 'detected_object.jpg'), image_screen)
 
         return center[0], center[1], matching_score
 
     def find_element(self, element: ImageElement) -> ImagePosition | None:
-        res = self.find_object_on_screen_get_coordinates(
-            image_path=element.path,
-            threshold=element.threshold,
-            specific_region=element.region,
-        )
+        res = self.find_object_on_screen_get_coordinates(image_path=element.path, specific_region=element.region)
         return ImagePosition(x=res[0], y=res[1], ssim=res[2]) if res else None
+
+    def wait_for_image(
+            self,
+            element: ImageElement,
+            timeout: float = 5,
+            intervals: float = 0.5
+    ) -> ImagePosition | None:
+
+        timer = 0
+        while timer < timeout:
+            res = self.find_object_on_screen_get_coordinates(image_path=element.path, specific_region=element.region)
+            if res[2] >= element.ssim:
+                return ImagePosition(x=res[0], y=res[1], ssim=res[2])
+            timer += intervals
 
     def find_colors_in_specific_region_on_screen(
             self,

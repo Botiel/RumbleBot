@@ -1,35 +1,32 @@
 import logging
 from random import choice
 from time import sleep, time
-from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException, GoldNotFoundException
-from rumble_bot_api.bot_core.utils.data_objects import QuestsMatchObject
+from rumble_bot_api.bot_core.utils.data_objects import MatchObject
 from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
-from typing import Optional
 
 
 class QuestsHandler(BaseHandler):
 
-    def __init__(self, processor: Processor):
-        super().__init__(processor)
+    def __init__(self, drop_handler: DropHandler):
+        super().__init__(drop_handler)
         self.set_game_mode('quests')
-        self.match_object: Optional[QuestsMatchObject] = None
+        self.levelup_list = []
 
-    def set_quests_match_object(self, match_object: QuestsMatchObject) -> None:
-        logging.info('[Quests Handler] setting up quests match object and drop handler')
-        logging.debug(f'[Quests Handler] lineup: {match_object.lineup}')
-        self.match_object = match_object
-        self.drop_handler = DropHandler(self._processor, match_object.lineup)
+    def set_quests_match_object(self, match_object: MatchObject) -> None:
+        logging.info('[Quests Handler] setting up lineup and levelup list')
+        self.drop_handler.set_lineup(match_object.lineup)
+        self.levelup_list = match_object.levelup_list
 
     def match_mini_and_play_button_in_quest(self) -> None:
         logging.info('[Quests Handler] Matching minions in quest to buttons')
 
-        new_li = [item.name.split('_')[0] for item in self.match_object.levelup_list]
+        new_li = [item.name.split('_')[0] for item in self.levelup_list]
 
-        minis = self.tesseract.extract_many_string_coordinates_from_tesseract_data(new_li, 180, False)
+        minis = self.tesseract.extract_many_string_coordinates_from_tesseract_data(new_li, 220, False)
         buttons = self.tesseract.wait_for_element(STRING_ASSETS.PLAY, 5)
 
         if not minis:
@@ -74,12 +71,12 @@ class QuestsHandler(BaseHandler):
 
         self.match_mini_and_play_button_in_quest()
 
+        self.wait_for_load_state()
+
         self.set_game_state(GameState.QUESTS_MATCH_LOOP)
 
     def match_loop(self) -> None:
         logging.info('[Quests Handler] Starting a Quests Match')
-
-        self.wait_for_load_state()
 
         self.tesseract.wait_for_element_state(STRING_ASSETS.START, state='visible', timeout=60)
         self.actions.wait_and_try_click_string_element(STRING_ASSETS.START, timeout_after_click=2)
@@ -91,7 +88,7 @@ class QuestsHandler(BaseHandler):
         curr_zone = self.drop_handler.drop_zones.LEFT
 
         while True:
-            for mini in self.match_object.lineup:
+            for mini in self.drop_handler.lineup:
 
                 logging.info(f'[Quests Handler] Next Mini in queue: {mini.name}')
 
@@ -112,26 +109,20 @@ class QuestsHandler(BaseHandler):
                     else:
                         curr_zone = self.drop_handler.drop_zones.LEFT
 
-            error = [
-                self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.ERROR),
-                self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.TOOLS)
-
-            ]
-            if any(error):
-                self.set_game_state(GameState.ERROR_STATE)
+            if self.match_error_check():
                 return
 
     def match_finish(self) -> None:
         logging.info('[Match Handler] Navigating to a new game')
 
-        is_continue = None
-        is_try_again = None
+        is_continue = False
+        is_try_again = False
 
         start_time = time()
         while time() - start_time < 15:
             is_continue = self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.CONTINUE)
             is_try_again = self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.TRY_AGAIN)
-            sleep(0.5)
+            sleep(0.2)
             if is_continue or is_try_again:
                 break
 

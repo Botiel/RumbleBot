@@ -3,24 +3,22 @@ from time import sleep
 import sys
 from rumble_bot_api.bot_core.utils.custom_exceptions import GoldNotFoundException
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
-from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
+from rumble_bot_api.bot_core.utils.common import LEVELUP_HEART
 from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
-
-from typing import Literal, Optional
+from typing import Literal
 
 
 class BaseHandler:
 
-    def __init__(self, processor: Processor):
-        self._processor = processor
-        self.window = processor.window
-        self.tesseract = processor.tesseract
-        self.image_processing = processor.image_processing
-        self.actions = processor.actions
+    def __init__(self, drop_handler: DropHandler):
+        self.drop_handler = drop_handler
+        self.window = self.drop_handler.processor.window
+        self.tesseract = self.drop_handler.processor.tesseract
+        self.image_processing = self.drop_handler.processor.image_processing
+        self.actions = self.drop_handler.processor.actions
 
-        self.drop_handler: Optional[DropHandler] = None
         self._current_state = None
         self._mode = None
 
@@ -29,41 +27,36 @@ class BaseHandler:
         logging.info(f'[Base Handler] state is set to: {state.value}')
         self._current_state = state
 
-    def set_game_mode(self, mode: Literal['quests', 'pvp']) -> None:
+    def set_game_mode(self, mode: Literal['quests', 'pvp', 'boss']) -> None:
 
-        if mode not in ['quests', 'pvp']:
+        if mode not in ['quests', 'pvp', 'boss']:
             raise ValueError(f'no such game mode: {mode}')
 
         logging.info(f'[Base Handler] game mode is set to: {mode}')
         self._mode = mode
 
     # ------------------------------------------------- GENERAL --------------------------------------------------------
-    def wait_for_load_state(self, wait_time: int = 45) -> None:
+    def wait_for_load_state(self) -> None:
         logging.info('[Loading State] Loading...')
         self.tesseract.wait_for_element_state(
             element=STRING_ASSETS.LOADING,
-            timeout=wait_time,
+            timeout=20,
             state='visible'
         )
         self.tesseract.wait_for_element_state(
             element=STRING_ASSETS.LOADING,
-            timeout=wait_time,
+            timeout=45,
             state='hidden'
         )
         logging.info('[Loading State] Done!')
 
     def handle_level_up(self) -> None:
         logging.info('[Base Handler] handling level up')
+        result = self.image_processing.wait_for_image(LEVELUP_HEART)
+        if result:
+            self.actions.click(result)
 
-        try:
-            self.tesseract.wait_for_element_state(STRING_ASSETS.LEVEL_UP, 'visible', 7)
-        except ElementNotFoundException:
-            logging.info('[Base Handler] no level up...')
-            return
-
-        self.actions.click_string_element_until_hidden(STRING_ASSETS.LEVEL_UP)
-
-    def wait_for_match_to_start(self, timeout: float = 40, intervals: float = 0.5) -> None:
+    def wait_for_match_to_start(self, timeout: float = 40, intervals: float = 0.2) -> None:
         logging.info(f'[Base Handler] Waiting for the match to start: {self._mode}')
 
         timer = 0
@@ -118,6 +111,9 @@ class BaseHandler:
         if self._mode == 'pvp':
             return GameState.INIT_PVP
 
+        if self._mode == 'boss':
+            return GameState.PRE_BOSS_MATCH
+
     def check_if_game_crashed(self) -> GameState | None:
         logging.info('[Error Handler] Checking if the game crashed')
 
@@ -139,6 +135,9 @@ class BaseHandler:
         if self._mode == 'pvp':
             return GameState.INIT_PVP
 
+        if self._mode == 'boss':
+            return GameState.PRE_BOSS_MATCH
+
     def find_current_game_states(self) -> GameState | None:
         logging.error('[Error Handler] Trying to find current state')
 
@@ -148,7 +147,18 @@ class BaseHandler:
                 (STRING_ASSETS.TRY_AGAIN, GameState.QUESTS_GAME_FINISH),
                 (STRING_ASSETS.CONTINUE, GameState.QUESTS_GAME_FINISH),
                 (STRING_ASSETS.CLAIM, GameState.INIT_QUESTS),
+                (STRING_ASSETS.CLAIM_AFTER_QUEST, GameState.INIT_QUESTS),
                 (STRING_ASSETS.QUEST, GameState.INIT_QUESTS),
+            ]
+
+        elif self._mode == 'boss':
+            elements_to_check = [
+                (STRING_ASSETS.START, GameState.BOSS_MATCH_LOOP),
+                (STRING_ASSETS.TRY_AGAIN, GameState.BOSS_GAME_FINISH),
+                (STRING_ASSETS.CONTINUE, GameState.BOSS_GAME_FINISH),
+                (STRING_ASSETS.BOSS_PLAY, GameState.PRE_BOSS_MATCH),
+                (STRING_ASSETS.PVP, GameState.INIT_BOSS),
+                (STRING_ASSETS.BACK, GameState.PRE_BOSS_MATCH),
             ]
 
         elif self._mode == 'pvp':
@@ -180,7 +190,7 @@ class BaseHandler:
         self.window.set_window()
         location = self.tesseract.wait_for_element(STRING_ASSETS.RUMBLE, 45)[0]
         self.actions.click(location, timeout_before_action=1)
-        self.wait_for_load_state(45)
+        self.wait_for_load_state()
 
         if self._mode == 'quests':
             return GameState.INIT_QUESTS
@@ -207,3 +217,17 @@ class BaseHandler:
             if state:
                 self.set_game_state(state)
                 return
+
+            self.handle_level_up()
+
+    def match_error_check(self) -> bool:
+        error = [
+            self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.ERROR),
+            self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.FAILED),
+            self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.TOOLS)
+        ]
+        if any(error):
+            self.set_game_state(GameState.ERROR_STATE)
+            return True
+
+        return False

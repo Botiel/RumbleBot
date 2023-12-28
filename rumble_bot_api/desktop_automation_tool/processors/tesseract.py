@@ -7,18 +7,17 @@ import os
 from time import sleep, time
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 from rumble_bot_api.desktop_automation_tool.utils.data_objects import Rect, Region, StringElement
-from rumble_bot_api.desktop_automation_tool.utils.common import get_folder
+from rumble_bot_api.desktop_automation_tool.utils.common import get_output_folder
 from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
 
 
 class Tesseract:
 
-    def __init__(self, window: WindowObject, yaml_config: dict):
+    def __init__(self, window: WindowObject):
         self.window = window
-        self._yaml_config = yaml_config
         self._psm = 6
         self._save_image = False
-        self.set_tesseract_path(yaml_config.get('tesseract_path'))
+        self._output_folder = get_output_folder()
 
     @staticmethod
     def set_tesseract_path(tesseract_path: str) -> None:
@@ -69,8 +68,7 @@ class Tesseract:
         _, thresholded_image = cv2.threshold(gray_image, threshold, 255, cv2.THRESH_BINARY)
 
         if self._save_image:
-            output = get_folder(self._yaml_config, 'output')
-            file = output / 'thresholded_tesseract_screenshot.png'
+            file = self._output_folder / 'thresholded_tesseract_screenshot.png'
             cv2.imwrite(str(file), thresholded_image)
 
         data = pytesseract.image_to_data(thresholded_image, output_type=Output.DICT, config=f'--psm {self._psm}')

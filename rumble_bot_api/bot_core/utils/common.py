@@ -7,21 +7,38 @@ RUMBLE_BOT_API_FOLDER = CURR.parent.parent
 ASSETS_FOLDER = RUMBLE_BOT_API_FOLDER / 'assets'
 MINIS_FOLDER = ASSETS_FOLDER / 'minis'
 HEROES_FOLDER = ASSETS_FOLDER / 'heroes'
-TOWER_IMAGE = ASSETS_FOLDER / 'other' / 'tower.png'
-MAP_ICON_IMAGE = ASSETS_FOLDER / 'other' / 'map.png'
-COLLECTION_ICON_IMAGE = ASSETS_FOLDER / 'other' / 'collection.png'
+OTHER_FOLDER = ASSETS_FOLDER / 'other'
+TOWER_IMAGE = OTHER_FOLDER / 'tower.png'
 ALLOWED_MINI_ARGS = ['skill_0', 'skill_1', 'skill_2', 'skill_3']
 
 COLLECTION_ELEMENT = ImageElement(
     name='collection_icon',
-    path=str(COLLECTION_ICON_IMAGE),
+    path=str(OTHER_FOLDER / 'collection.png'),
     ssim=0.8
 )
 
 MAP_ELEMENT = ImageElement(
     name='map_icon',
-    path=str(MAP_ICON_IMAGE),
+    path=str(OTHER_FOLDER / 'map.png'),
     ssim=0.8
+)
+
+ACT_1_ELEMENT = ImageElement(
+    name='act_1',
+    path=str(OTHER_FOLDER / 'act1.png'),
+    ssim=0.8
+)
+
+ACT_2_ELEMENT = ImageElement(
+    name='act_2',
+    path=str(OTHER_FOLDER / 'act2.png'),
+    ssim=0.8
+)
+
+LEVELUP_HEART = ImageElement(
+    name='levelup_heart',
+    path=str(OTHER_FOLDER / 'levelup.png'),
+    ssim=0.7
 )
 
 

@@ -9,7 +9,7 @@ from rumble_bot_api.predictor.predictor_object import Predictor
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ImageNotFoundException
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
-from rumble_bot_api.bot_core.utils.data_objects import Node
+from rumble_bot_api.bot_core.utils.data_objects import Node, Asset
 
 
 @dataclass(kw_only=True)
@@ -22,15 +22,19 @@ class DropZone:
 
 class DropHandler:
 
-    def __init__(self, processor: Processor, lineup: list[Node]):
+    def __init__(self, processor: Processor, predictor: Predictor):
         self.processor = processor
-        self.predictor = Predictor(processor.window, processor.yaml_config)
-        self.gold_handler = GoldHandler(processor, self.predictor)
+        self.predictor = predictor
+        self.gold_handler = GoldHandler(processor, predictor)
 
         # Settings
-        self.lineup = lineup
+        self.lineup: Optional[list[Node]] = None
         self.tower_center: Optional[Position] = None
         self.drop_zones: Optional[DropZone] = None
+
+    def set_lineup(self, lineup: list[Node]) -> None:
+        logging.info(f'Setting up new lineup: {lineup}')
+        self.lineup = lineup
 
     # ------------------- CALCULATIONS ------------------------
     def init_tower_center_by_pixels(self, tower_ssim: float = 0.6) -> None:
@@ -43,7 +47,14 @@ class DropHandler:
 
     def calculate_drop_zones_for_quests(self) -> None:
         logging.info('[Drop Handler] Calculating Tower Center')
-        self.init_tower_center_by_pixels()
+
+        while True:
+            try:
+                self.init_tower_center_by_pixels()
+            except ImageNotFoundException:
+                continue
+            else:
+                break
 
         x_offset = 120
         y_offset = -80

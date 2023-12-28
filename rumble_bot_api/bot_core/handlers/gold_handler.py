@@ -51,7 +51,7 @@ class GoldHandler:
     def wait_until_enough_gold(self, gold: int) -> None:
         logging.info(f'[Gold Handler] Waiting for [{gold}] gold to play mini')
 
-        interval = 0.5
+        interval = 0.2
         time_elapsed = 0
         total_time = 18
 

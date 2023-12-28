@@ -1,9 +1,5 @@
 import logging
 from time import sleep, time
-
-import pyautogui
-
-from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
 from rumble_bot_api.bot_core.handlers.base_handler import BaseHandler
@@ -16,8 +12,8 @@ from typing import Optional
 
 class PvpHandler(BaseHandler):
 
-    def __init__(self, processor: Processor):
-        super().__init__(processor)
+    def __init__(self, drop_handler: DropHandler):
+        super().__init__(drop_handler)
         self.set_game_mode('pvp')
         self.match_object: Optional[PvpMatchObject] = None
 
@@ -27,7 +23,7 @@ class PvpHandler(BaseHandler):
         self.match_object = match_object
         lineup = match_object.lineup
         lineup.append(MINI_ASSETS.miner.skill_0)
-        self.drop_handler = DropHandler(self._processor, lineup)
+        self.drop_handler.set_lineup(lineup)
 
     def init_pvp(self) -> None:
         logging.info('[PvP Handler] Initializing PVP match')
@@ -63,13 +59,7 @@ class PvpHandler(BaseHandler):
                 self.set_game_state(GameState.PVP_GAME_FINISH)
                 return
 
-            error = [
-                self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.ERROR),
-                self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.FAILED),
-                self.tesseract.check_if_element_is_visible_on_screen(STRING_ASSETS.TOOLS)
-            ]
-            if any(error):
-                self.set_game_state(GameState.ERROR_STATE)
+            if self.match_error_check():
                 return
 
     def match_finish(self) -> None:

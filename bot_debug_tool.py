@@ -2,14 +2,9 @@ from rumble_bot_api.desktop_automation_tool.debug_tool.debugger_tool import Debu
 from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
 from rumble_bot_api.predictor.predictor_object import Predictor
 from rumble_bot_api.bot_core.handlers.gold_handler import GoldHandler
-from rumble_bot_api.desktop_automation_tool.utils.common import find_root_dir
+from config import TESSERACT_PATH, EMULATOR_PATH, EMULATOR_TITLE
 from dataclasses import asdict
-from pathlib import Path
 import PySimpleGUI as sg
-
-
-ROOT = Path(__file__).resolve().parent
-MODELS = ROOT / 'predictor' / 'models'
 
 
 def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
@@ -21,7 +16,7 @@ def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
     except Exception:
         f_conf = 0.8
 
-    p = Predictor(processor.window, processor.yaml_config)
+    p = Predictor(processor.window)
     res = p.predict(save=True, conf=f_conf)
     res_as_dict = asdict(res)
 
@@ -32,7 +27,8 @@ def make_prediction(gui_window: sg.Window, processor: Processor) -> None:
 
 def get_gold(gui_window: sg.Window, processor: Processor) -> None:
     gui_window['DISPLAY'].update('')
-    gold_handler = GoldHandler(processor)
+    p = Predictor(processor.window)
+    gold_handler = GoldHandler(processor, p)
     curr_gold = gold_handler.get_current_gold_on_bar()
     print(curr_gold)
 
@@ -61,10 +57,13 @@ def main() -> None:
             'GET_GOLD_BTN': get_gold
         }
     }
-    project_dir = find_root_dir()
-    yaml_file = project_dir / 'config.yaml'
 
-    tool = DebuggerTool(yaml_file=yaml_file, custom_functions=custom_functions)
+    tool = DebuggerTool(
+        TESSERACT_PATH,
+        EMULATOR_PATH,
+        EMULATOR_TITLE,
+        custom_functions
+    )
     tool.main_loop()
 
 
