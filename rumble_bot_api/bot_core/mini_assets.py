@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class MiniAssets(BaseModel):
-    ssim: float = 0.7
+    ssim: float = 0.6
     region: Region = Region(top_left=Position(x=330, y=830), bottom_right=Position(x=770, y=970))
 
     # Minis
@@ -31,6 +31,13 @@ class MiniAssets(BaseModel):
     defias_bandits: Asset = create_asset('defias_bandits', cost=1)
     hogger: Asset = create_asset('hogger', cost=4)
     murloc_tidehunters: Asset = create_asset('murloc_tidehunters', cost=2)
+    earth_elemental: Asset = create_asset('earth_elemental', cost=3, is_unbound=True)
+    skeleton_party: Asset = create_asset('skeleton_party', cost=4, is_unbound=True)
+    whelp_eggs: Asset = create_asset('whelp_eggs', cost=3, is_unbound=True)
+    worgen: Asset = create_asset('worgen', cost=3, is_unbound=True)
+    holy_nova: Asset = create_asset('holy_nova', cost=3, is_spell=True)
+    execute: Asset = create_asset('execute', cost=3, is_spell=True)
+    blizzard: Asset = create_asset('blizzard', cost=4, is_spell=True)
 
 
 MINI_ASSETS = MiniAssets()

@@ -9,6 +9,7 @@ from ultralytics.engine.results import Results
 from rumble_bot_api.predictor.data_objects import PredictionNode, PredictionCluster
 from rumble_bot_api.desktop_automation_tool.processors.window_object import WindowObject
 from rumble_bot_api.desktop_automation_tool.utils.data_objects import Position
+from rumble_bot_api.desktop_automation_tool.utils.common import get_output_folder
 
 
 CURR = Path(__file__).resolve().parent
@@ -17,13 +18,13 @@ MODEL_PATH = CURR / 'rumble.pt'
 
 class Predictor:
 
-    def __init__(self, window: WindowObject, yaml_config: dict, model_path: str = str(MODEL_PATH)):
+    def __init__(self, window: WindowObject, model_path: str = str(MODEL_PATH)):
         self.window = window
-        self.output_dir = f"{yaml_config.get('project_root')}/output"
+        self._output_dir = get_output_folder()
         self.model_path = model_path
 
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir, exist_ok=True)
+        if not os.path.exists(self._output_dir):
+            os.makedirs(self._output_dir, exist_ok=True)
 
     def predict(self, image: str | np.ndarray = None, conf: float = 0.8, save: bool = False) -> PredictionCluster:
 
@@ -42,7 +43,7 @@ class Predictor:
             conf=conf,
             save=save,
             device=0,
-            project=self.output_dir
+            project=self._output_dir
         )
 
         prediction_cluster = PredictionCluster()

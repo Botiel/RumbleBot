@@ -7,36 +7,43 @@ from numpy import ndarray
 import pygetwindow
 import subprocess
 import sys
+from pathlib import Path
 from uuid import uuid4
 from typing import Optional
 from pygetwindow import PyGetWindowException, Win32Window
 from rumble_bot_api.desktop_automation_tool.utils.data_objects import Region
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import WindowNotFoundException
-from rumble_bot_api.desktop_automation_tool.utils.common import get_folder
+from rumble_bot_api.desktop_automation_tool.utils.common import get_output_folder
 
 
 class WindowObject:
 
-    def __init__(self, yaml_config: dict):
-        self._yaml_config = yaml_config
-        self.window_title = yaml_config.get('window_title')
-        self.executable_path = yaml_config.get('window_path')
+    def __init__(self):
+        self._window_title = None
+        self._executable_path = None
         self.window: Optional[Win32Window] = None
+        self._output_folder = get_output_folder()
 
-    def set_window(self) -> None:
+    def set_window_title_and_object(self, title: str) -> None:
+        logging.info(f'[Window] Setting window object and title: {title}')
+
         windows = pygetwindow.getAllWindows()
         try:
-            window = list(filter(lambda x: x.title == self.window_title, windows))[0]
+            window = list(filter(lambda x: x.title == title, windows))[0]
         except IndexError:
             raise WindowNotFoundException
 
-        logging.info(f'[Window] Setting window object')
+        self._window_title = title
         self.window = window
+
+    def set_executable_path(self, path: str) -> None:
+        logging.info(f'[Window] Setting window executable path: {path}')
+        self._executable_path = path
 
     def run_window(self) -> None:
         try:
             subprocess.Popen(
-                [self.executable_path],
+                [self._executable_path],
                 shell=True,
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
@@ -44,7 +51,7 @@ class WindowObject:
                 start_new_session=True,
                 close_fds=True
             )
-            print(f"Executable ran successfully: {self.executable_path}")
+            print(f"Executable ran successfully: {self._executable_path}")
 
         except subprocess.CalledProcessError as e:
             print(f"Error running the executable: {e}")
@@ -71,7 +78,8 @@ class WindowObject:
             self,
             specific_region: Region = None,
             save_image: bool = False,
-            generate_name: bool = False
+            generate_name: bool = False,
+            folder_path: Path | str = None
     ) -> ndarray:
         """
 
@@ -94,7 +102,11 @@ class WindowObject:
             screenshot[mask == 0] = [0, 0, 0]
 
         if save_image:
-            output = get_folder(self._yaml_config, 'output')
+
+            if folder_path:
+                output = folder_path
+            else:
+                output = self._output_folder
 
             if generate_name:
                 file = output / f'window_screenshot_{uuid4().hex[:15]}.png'

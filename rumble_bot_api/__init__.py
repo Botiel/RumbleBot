@@ -1,5 +1,10 @@
 from rumble_bot_api.bot_core.mini_assets import MINI_ASSETS as MINIS
-from rumble_bot_api.bot_api_object import BaseBotSetup
+from rumble_bot_api.bot_core.string_assets import STRING_ASSETS as STRINGS
 from rumble_bot_api.desktop_automation_tool.utils.data_objects import Position
-from rumble_bot_api.bot_core.utils.data_objects import QuestsMatchObject, PvpMatchObject
+from rumble_bot_api.bot_core.utils.data_objects import MatchObject, PvpMatchObject
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
+from rumble_bot_api.desktop_automation_tool.processors_loader import Processor
+from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
+from rumble_bot_api.bot_core.handlers.quests_handler import QuestsHandler
+from rumble_bot_api.bot_core.handlers.boss_handler import BossHandler
+from rumble_bot_api.predictor.predictor_object import Predictor

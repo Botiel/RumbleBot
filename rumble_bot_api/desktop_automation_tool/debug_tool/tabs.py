@@ -8,7 +8,13 @@ DROP_TEXT = (16, 1)
 DROP_INPUT = (5, 1)
 
 
-def load_layout(yaml_config: dict, images_dict: dict, custom_functions: dict = None) -> list:
+def load_layout(
+        tesseract_path: str,
+        window_path: str,
+        window_title: str,
+        images_dict: dict,
+        custom_functions: dict = None
+) -> list:
     coordinates_frame = [
         [sg.Text("")],
 
@@ -26,13 +32,13 @@ def load_layout(yaml_config: dict, images_dict: dict, custom_functions: dict = N
         [sg.Text("")],
 
         [sg.Text("Tesseract Path:", size=TEXT_SIZE),
-         sg.InputText(size=(60, 1), key="TESSERACT_PATH", default_text=yaml_config.get('tesseract_path'))],
+         sg.InputText(size=(60, 1), key="TESSERACT_PATH", default_text=tesseract_path)],
 
         [sg.Text("Emulator Path:", size=TEXT_SIZE),
-         sg.InputText(size=(60, 1), key="EMULATOR_PATH", default_text=yaml_config.get('window_path'))],
+         sg.InputText(size=(60, 1), key="EMULATOR_PATH", default_text=window_path)],
 
         [sg.Text("Window Title:", size=TEXT_SIZE),
-         sg.InputText(size=(60, 1), key="EMULATOR_TITLE", default_text=yaml_config.get('window_title'))],
+         sg.InputText(size=(60, 1), key="EMULATOR_TITLE", default_text=window_title)],
 
         [sg.Text("")],
 
@@ -71,8 +77,6 @@ def load_layout(yaml_config: dict, images_dict: dict, custom_functions: dict = N
                 values=list(images_dict)
             )
         ],
-
-        [sg.Text("Image Threshold:", size=(15, 1)), sg.InputText(size=(7, 1), key="IMAGE_THRESHOLD", default_text='')],
 
         [
             sg.Text("Region:", size=(15, 1)),

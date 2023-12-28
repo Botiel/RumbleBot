@@ -13,6 +13,10 @@ class GameState(Enum):
     INIT_PVP = 'init_pvp'
     PVP_MATCH_LOOP = 'pvp_match_loop'
     PVP_GAME_FINISH = 'pvp_game_finish'
+    INIT_BOSS = 'init_boss'
+    PRE_BOSS_MATCH = 'pre_boss_match'
+    BOSS_MATCH_LOOP = 'boss_match_loop'
+    BOSS_GAME_FINISH = 'boss_game_finish'
 
 
 class Node(BaseModel):
@@ -23,14 +27,15 @@ class Node(BaseModel):
 
 class Asset(BaseModel):
     name: str = Field(default=None)
-    is_unbound: bool = Field(default=None)
+    is_unbound: bool = Field(default=False)
+    is_spell: bool = Field(default=False)
     skill_0: Node = Field(default=None)
     skill_1: Node = Field(default=None)
     skill_2: Node = Field(default=None)
     skill_3: Node = Field(default=None)
 
 
-class QuestsMatchObject(BaseModel):
+class MatchObject(BaseModel):
     lineup: list[Node]
     hero: Asset
     levelup_list: list[Asset] = []
@@ -44,10 +49,17 @@ class PvpMatchObject(BaseModel):
     scroll_up_before_match: Callable = None
 
 
-def create_asset(name: str, cost: int, is_unbound: bool = False, changed_cost: dict = None) -> Asset:
+def create_asset(
+        name: str,
+        cost: int,
+        is_unbound: bool = False,
+        is_spell: bool = False,
+        changed_cost: dict = None
+) -> Asset:
     temp = {
         'name': name,
         'is_unbound': is_unbound,
+        'is_spell': is_spell,
         'skill_0': {
             'path': str(MINIS_FOLDER / f'{name}_0.png'),
             'cost': cost,

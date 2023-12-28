@@ -4,6 +4,7 @@ debug.py
 output/
 .idea/
 runs/
+screenshots/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
