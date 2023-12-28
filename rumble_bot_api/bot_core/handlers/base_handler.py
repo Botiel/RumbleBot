@@ -56,27 +56,22 @@ class BaseHandler:
         if result:
             self.actions.click(result)
 
-    def wait_for_match_to_start(self, timeout: float = 40, intervals: float = 0.2) -> None:
+    def wait_for_match_to_start(self, timeout: float = 40, intervals: float = 0.5) -> None:
         logging.info(f'[Base Handler] Waiting for the match to start: {self._mode}')
 
         timer = 0
 
         while True:
 
-            try:
-                self.drop_handler.gold_handler.get_current_gold_on_bar()
-
-            except GoldNotFoundException:
+            result = self.drop_handler.get_current_minis_on_board()
+            if not result:
                 sleep(intervals)
                 timer += intervals
-
-                if timer == timeout:
-                    raise Exception(f'[Base Handler] Match did not start after {timer} seconds')
-
-                continue
-
             else:
                 break
+
+            if timer == timeout:
+                raise Exception(f'[Base Handler] Match did not start after {timer} seconds')
 
     # ---------------------------------------------- ERROR HANDLING ----------------------------------------------------
     def check_for_error_message(self) -> GameState | None:
