@@ -6,12 +6,12 @@ from config import TESSERACT_PATH, EMULATOR_PATH, EMULATOR_TITLE
 BARON_PVE = MatchObject(
     hero=MINIS.baron_rivendare,
     lineup=[
-        MINIS.huntress.skill_1,
+        MINIS.prowler.skill_1,
         MINIS.ghoul.skill_1,
         MINIS.necromancer.skill_1,
-        MINIS.darkspear_troll.skill_1,
+        MINIS.skeleton_party.skill_1,
         MINIS.pilot.skill_1,
-        MINIS.harpies.skill_1,
+        MINIS.gryphon_rider.skill_1,
         MINIS.baron_rivendare.skill_1
     ],
     levelup_list=[
@@ -23,6 +23,8 @@ BARON_PVE = MatchObject(
         MINIS.gryphon_rider,
         MINIS.blizzard,
         MINIS.whelp_eggs,
+        MINIS.prowler,
+        MINIS.skeleton_party
     ]
 )
 
@@ -31,11 +33,11 @@ BARON_PVE2 = MatchObject(
     lineup=[
         MINIS.baron_rivendare.skill_1,
         MINIS.ghoul.skill_0,
-        MINIS.bat_rider.skill_0,
+        MINIS.bat_rider.skill_1,
         MINIS.darkspear_troll.skill_0,
         MINIS.gryphon_rider.skill_0,
         MINIS.pilot.skill_0,
-        MINIS.quilboar.skill_0
+        MINIS.quilboar.skill_1
     ],
     levelup_list=[
         MINIS.quilboar,
@@ -75,7 +77,7 @@ TIRION_PVE = MatchObject(
 
 def main() -> None:
 
-    set_logger(20)
+    set_logger()
 
     processor = Processor()
     processor.set_configurations(TESSERACT_PATH, EMULATOR_PATH, EMULATOR_TITLE)

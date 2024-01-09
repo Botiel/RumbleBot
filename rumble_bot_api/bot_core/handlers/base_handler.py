@@ -5,7 +5,7 @@ from rumble_bot_api.bot_core.utils.custom_exceptions import GoldNotFoundExceptio
 from rumble_bot_api.desktop_automation_tool.utils.custom_exceptions import ElementNotFoundException
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS
 from rumble_bot_api.bot_core.utils.data_objects import GameState
-from rumble_bot_api.bot_core.utils.common import LEVELUP_HEART
+from rumble_bot_api.bot_core.utils.common import LEVELUP_STAR
 from rumble_bot_api.bot_core.handlers.drop_handler import DropHandler
 from typing import Literal
 
@@ -40,7 +40,7 @@ class BaseHandler:
         logging.info('[Loading State] Loading...')
         self.tesseract.wait_for_element_state(
             element=STRING_ASSETS.LOADING,
-            timeout=20,
+            timeout=30,
             state='visible'
         )
         self.tesseract.wait_for_element_state(
@@ -52,7 +52,7 @@ class BaseHandler:
 
     def handle_level_up(self) -> None:
         logging.info('[Base Handler] handling level up')
-        result = self.image_processing.wait_for_image(LEVELUP_HEART)
+        result = self.image_processing.wait_for_image(LEVELUP_STAR, timeout=15)
         if result:
             self.actions.click(result)
 

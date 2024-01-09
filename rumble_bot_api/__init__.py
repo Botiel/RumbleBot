@@ -1,6 +1,6 @@
 from rumble_bot_api.bot_core.mini_assets import MINI_ASSETS as MINIS
 from rumble_bot_api.bot_core.string_assets import STRING_ASSETS as STRINGS
-from rumble_bot_api.desktop_automation_tool.utils.data_objects import Position
+from rumble_bot_api.desktop_automation_tool.utils.data_objects import Position, Region
 from rumble_bot_api.bot_core.utils.data_objects import MatchObject, PvpMatchObject
 from rumble_bot_api.bot_core.utils.custom_exceptions import NoMinisOnBoardException
 from rumble_bot_api.desktop_automation_tool.processors_loader import Processor

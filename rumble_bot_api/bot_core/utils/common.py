@@ -35,10 +35,10 @@ ACT_2_ELEMENT = ImageElement(
     ssim=0.8
 )
 
-LEVELUP_HEART = ImageElement(
-    name='levelup_heart',
-    path=str(OTHER_FOLDER / 'levelup.png'),
-    ssim=0.7
+LEVELUP_STAR = ImageElement(
+    name='levelup_star',
+    path=str(OTHER_FOLDER / 'star.png'),
+    ssim=0.6
 )
 
 
