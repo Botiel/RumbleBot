@@ -155,6 +155,7 @@ class DebuggerTool:
     def main_loop(self):
 
         while True:
+
             try:
                 self.events()
             except Exception as e:

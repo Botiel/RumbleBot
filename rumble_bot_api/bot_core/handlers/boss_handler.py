@@ -18,7 +18,7 @@ class BossHandler(BaseHandler):
 
         self._boss = STRING_ASSETS.DREADNAUGHT
         self.drop_handler.set_lineup([
-                MINIS.quilboar.skill_0,
+                MINIS.quilboar.skill_1,
                 MINIS.pilot.skill_1,
                 MINIS.worgen.skill_1,
                 MINIS.blizzard.skill_1,
@@ -64,7 +64,7 @@ class BossHandler(BaseHandler):
 
         bottom = Position(x=779, y=507)
         top = Position(x=656, y=389)
-        top2 = Position(x=600, y=310)
+        top2 = Position(x=600, y=350)
         middle = Position(x=640, y=475)
 
         self.tesseract.wait_for_element_state(STRING_ASSETS.START, state='visible', timeout=20)

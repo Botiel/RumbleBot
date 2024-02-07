@@ -25,6 +25,7 @@ class QuestsHandler(BaseHandler):
         logging.info('[Quests Handler] Matching minions in quest to buttons')
 
         new_li = [item.name.split('_')[0] for item in self.levelup_list]
+        logging.debug(f'NEW LIST: {new_li}')
 
         minis = self.tesseract.extract_many_string_coordinates_from_tesseract_data(new_li, 220, False)
         buttons = self.tesseract.wait_for_element(STRING_ASSETS.PLAY, 5)
