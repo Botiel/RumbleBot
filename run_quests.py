@@ -11,7 +11,7 @@ BARON_PVE = MatchObject(
         MINIS.necromancer.skill_1,
         MINIS.skeleton_party.skill_1,
         MINIS.pilot.skill_1,
-        MINIS.gryphon_rider.skill_1,
+        MINIS.harpies.skill_1,
         MINIS.baron_rivendare.skill_1
     ],
     levelup_list=[
